@@ -32,7 +32,7 @@
             overflow-x: hidden;
         }
 
-        /* FONDO CON FLORES DE HIBISCO */
+        /* FONDO CON FLORES TATTOO SVG (INLINE - NO NECESITA ARCHIVO EXTERNO) */
         body::before {
             content: '';
             position: fixed;
@@ -40,11 +40,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('flores-fondo.png');
-            background-size: 400px auto;
-            background-repeat: repeat;
-            background-position: center;
-            opacity: 0.08;
+            background-image: url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M75 25 C80 45 95 45 100 60 C105 65 100 80 85 85 C90 100 80 105 75 100 C70 105 60 100 65 85 C50 80 45 65 50 60 C55 45 70 45 75 25' fill='none' stroke='%23222' stroke-width='1.5'/%3E%3Ccircle cx='75' cy='70' r='6' fill='%23222'/%3E%3Cpath d='M75 76 L75 95 M75 90 L68 98 M75 90 L82 98' stroke='%23222' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-size: 150px 150px;
+            opacity: 0.5;
             pointer-events: none;
             z-index: -1;
         }
@@ -57,9 +55,8 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 20, 147, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(255, 105, 180, 0.05) 0%, transparent 60%);
+                radial-gradient(circle at 20% 80%, rgba(255, 20, 147, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 40%);
             pointer-events: none;
             z-index: -1;
         }
@@ -86,18 +83,29 @@
             box-shadow: 
                 0 0 20px var(--rosa-flow),
                 0 0 40px rgba(255, 20, 147, 0.5),
-                0 0 80px rgba(255, 0, 255, 0.3),
-                inset 0 0 30px rgba(255, 20, 147, 0.2);
+                0 0 80px rgba(255, 0, 255, 0.3);
             animation: neon-pulse 1.5s ease-in-out infinite, float-logo 3s ease-in-out infinite;
             transition: all 0.3s;
+            background: linear-gradient(135deg, var(--rosa-flow) 0%, var(--rosa-neon) 100%);
         }
 
-        .logo-container:hover .logo-img {
-            transform: scale(1.08) rotate(3deg);
-            box-shadow: 
-                0 0 30px var(--rosa-neon),
-                0 0 60px rgba(255, 0, 255, 0.6),
-                0 0 100px rgba(255, 0, 255, 0.4);
+        .logo-placeholder {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 3px solid var(--rosa-flow);
+            background: linear-gradient(135deg, rgba(255,20,147,0.3) 0%, rgba(255,0,255,0.2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+            animation: neon-pulse 1.5s ease-in-out infinite, float-logo 3s ease-in-out infinite;
+        }
+
+        .logo-container:hover .logo-img,
+        .logo-container:hover .logo-placeholder {
+            transform: scale(1.05);
         }
 
         .logo-ring {
@@ -110,59 +118,21 @@
             border-radius: 50%;
             opacity: 0.6;
             animation: spin 8s linear infinite;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-        }
-
-        .logo-ring:nth-child(2) {
-            top: -30px;
-            left: -30px;
-            right: -30px;
-            bottom: -30px;
-            border: 2px dotted var(--cyan-neon);
-            opacity: 0.4;
-            animation: spin-reverse 12s linear infinite;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-
-        .logo-ring:nth-child(3) {
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border: 1px solid var(--rosa-flow);
-            opacity: 0.8;
-            animation: spin 15s linear infinite;
         }
 
         @keyframes neon-pulse {
-            0%, 100% { 
-                box-shadow: 
-                    0 0 20px var(--rosa-flow),
-                    0 0 40px rgba(255, 20, 147, 0.5),
-                    0 0 80px rgba(255, 0, 255, 0.3);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 40px var(--rosa-neon),
-                    0 0 80px rgba(255, 0, 255, 0.6),
-                    0 0 120px rgba(255, 0, 255, 0.4),
-                    0 0 160px rgba(255, 20, 147, 0.3);
-            }
+            0%, 100% { box-shadow: 0 0 20px var(--rosa-flow), 0 0 40px rgba(255, 20, 147, 0.5); }
+            50% { box-shadow: 0 0 40px var(--rosa-neon), 0 0 80px rgba(255, 0, 255, 0.6); }
         }
 
         @keyframes float-logo {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-10px); }
         }
 
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
-
-        @keyframes spin-reverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
         }
 
         h1 {
@@ -175,8 +145,6 @@
             background: linear-gradient(135deg, var(--blanco) 0%, var(--rosa-flow) 50%, var(--rosa-neon) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.5));
         }
 
         .tagline {
@@ -188,7 +156,6 @@
 
         .tagline span {
             color: var(--rosa-flow);
-            text-shadow: 0 0 10px var(--rosa-flow);
         }
 
         /* NAV */
@@ -200,10 +167,8 @@
             margin: 0 auto 20px;
             max-width: 650px;
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 20, 147, 0.2);
             border-radius: 100px;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.1);
         }
 
         nav a {
@@ -214,29 +179,10 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             transition: all 0.3s;
-            position: relative;
-            padding: 5px 0;
         }
 
         nav a:hover {
-            color: var(--rosa-neon);
-            text-shadow: 0 0 10px var(--rosa-neon);
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--rosa-flow);
-            transition: width 0.3s;
-            box-shadow: 0 0 10px var(--rosa-flow);
-        }
-
-        nav a:hover::after {
-            width: 100%;
+            color: var(--rosa-flow);
         }
 
         /* SECCIONES */
@@ -258,8 +204,7 @@
         }
 
         .titulo-seccion span {
-            color: var(--rosa-neon);
-            text-shadow: 0 0 20px var(--rosa-neon);
+            color: var(--rosa-flow);
         }
 
         /* FILTROS */
@@ -278,28 +223,14 @@
             padding: 12px 28px;
             border-radius: 100px;
             font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Space Grotesk', sans-serif;
         }
 
-        .filtro-btn:hover {
-            background: rgba(255, 20, 147, 0.2);
-            border-color: var(--rosa-flow);
-            color: var(--blanco);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.3);
-        }
-
-        .filtro-btn.activo {
+        .filtro-btn:hover, .filtro-btn.activo {
             background: var(--rosa-flow);
             color: var(--negro);
             border-color: var(--rosa-flow);
-            font-weight: 700;
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
         }
 
         /* PRODUCTOS */
@@ -311,21 +242,17 @@
 
         .producto-card {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 20, 147, 0.15);
             border-radius: 20px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s;
             position: relative;
         }
 
         .producto-card:hover {
-            transform: translateY(-10px) scale(1.02);
+            transform: translateY(-10px);
             border-color: var(--rosa-flow);
-            box-shadow: 
-                0 20px 40px rgba(255, 20, 147, 0.2),
-                0 0 60px rgba(255, 20, 147, 0.1),
-                inset 0 0 30px rgba(255, 20, 147, 0.05);
+            box-shadow: 0 20px 40px rgba(255, 20, 147, 0.2);
         }
 
         .producto-badge {
@@ -338,16 +265,12 @@
             border-radius: 100px;
             font-size: 0.65rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             z-index: 10;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
         }
 
         .producto-badge.agotado {
             background: #444;
             color: var(--blanco);
-            box-shadow: none;
         }
 
         .producto-img {
@@ -357,51 +280,17 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
-        }
-
-        .producto-img::before {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255, 0, 255, 0.3) 0%, transparent 70%);
-            animation: pulse-glow-bg 3s ease-in-out infinite;
-        }
-
-        @keyframes pulse-glow-bg {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
         }
 
         .placeholder {
             text-align: center;
             color: var(--gris);
-            z-index: 1;
         }
 
         .placeholder-icon {
             font-size: 3.5rem;
             margin-bottom: 12px;
             opacity: 0.7;
-            display: block;
-            filter: drop-shadow(0 0 10px rgba(255, 20, 147, 0.5));
-        }
-
-        .placeholder span {
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 16px;
-            border-radius: 100px;
-            border: 1px solid rgba(255, 20, 147, 0.3);
-        }
-
-        .producto-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
 
         .producto-info {
@@ -411,21 +300,17 @@
         .producto-tag {
             font-size: 0.7rem;
             color: var(--rosa-flow);
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 8px;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
         }
 
         .producto-nombre {
             font-family: 'Syne', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 8px;
-            color: var(--blanco);
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .producto-precio {
@@ -443,7 +328,7 @@
 
         .btn-consultar, .btn-comprar {
             width: 100%;
-            padding: 14px 20px;
+            padding: 14px;
             border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -451,11 +336,6 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Space Grotesk', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
             border: none;
         }
 
@@ -468,32 +348,17 @@
         .btn-consultar:hover {
             background: var(--rosa-flow);
             color: var(--negro);
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
-            transform: scale(1.02);
         }
 
         .btn-comprar {
             background: #00d084;
             color: var(--negro);
-            font-weight: 700;
-        }
-
-        .btn-comprar:hover {
-            background: #00ff9d;
-            box-shadow: 0 0 30px rgba(0, 255, 157, 0.5);
-            transform: scale(1.02);
         }
 
         .btn-agotado {
             border-color: #444;
             color: #666;
             cursor: not-allowed;
-        }
-
-        .btn-agotado:hover {
-            background: transparent;
-            box-shadow: none;
-            transform: none;
         }
 
         /* SOBRE MI */
@@ -506,20 +371,6 @@
             border: 1px solid rgba(255, 20, 147, 0.2);
             border-radius: 30px;
             padding: 50px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.1);
-        }
-
-        .sobre-mi::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 80%;
-            height: 200%;
-            background: radial-gradient(ellipse, rgba(255, 0, 255, 0.15) 0%, transparent 60%);
-            pointer-events: none;
         }
 
         .sobre-mi-foto {
@@ -530,50 +381,27 @@
             align-items: center;
             justify-content: center;
             border: 2px solid var(--rosa-flow);
-            position: relative;
-            z-index: 1;
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.3);
         }
 
         .sobre-mi-foto img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 24px;
-        }
-
-        .sobre-mi-foto::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(255, 0, 255, 0.2) 100%);
-            border-radius: 24px;
-        }
-
-        .sobre-mi-texto {
-            position: relative;
-            z-index: 1;
         }
 
         .sobre-mi-texto h3 {
             font-family: 'Syne', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 800;
             margin-bottom: 20px;
             text-transform: uppercase;
-            background: linear-gradient(135deg, var(--blanco) 0%, var(--rosa-flow) 50%, var(--rosa-neon) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.3));
         }
 
         .sobre-mi-texto p {
             color: var(--gris);
-            font-size: 1rem;
-            line-height: 1.9;
             margin-bottom: 15px;
+            line-height: 1.8;
         }
 
         .firma {
@@ -581,28 +409,14 @@
             font-size: 1.4rem;
             color: var(--rosa-flow);
             margin-top: 20px;
-            font-weight: 700;
-            text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
         }
 
         /* CONTACTO */
         .contacto-section {
             text-align: center;
             padding: 80px 30px;
-            position: relative;
             border-top: 1px solid rgba(255, 20, 147, 0.2);
             border-bottom: 1px solid rgba(255, 20, 147, 0.2);
-        }
-
-        .contacto-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(ellipse at center, rgba(255, 0, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
         }
 
         .contacto-section h2 {
@@ -611,13 +425,6 @@
             font-weight: 800;
             margin-bottom: 15px;
             text-transform: uppercase;
-            text-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
-        }
-
-        .contacto-section > p {
-            color: var(--gris);
-            margin-bottom: 40px;
-            font-size: 1rem;
         }
 
         .contacto-grid {
@@ -625,8 +432,6 @@
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
         }
 
         .contacto-item a {
@@ -642,17 +447,13 @@
             font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.3s;
-            backdrop-filter: blur(10px);
         }
 
         .contacto-item a:hover {
             background: var(--rosa-flow);
             color: var(--negro);
-            border-color: var(--rosa-flow);
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
         }
 
         /* FOOTER */
@@ -661,12 +462,10 @@
             padding: 40px;
             color: var(--gris);
             font-size: 0.85rem;
-            border-top: 1px solid rgba(255, 20, 147, 0.1);
         }
 
         footer span {
             color: var(--rosa-flow);
-            text-shadow: 0 0 10px var(--rosa-flow);
         }
 
         /* ADMIN */
@@ -686,15 +485,11 @@
             justify-content: center;
             font-size: 1.3rem;
             transition: all 0.3s;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.2);
         }
 
         .admin-btn:hover {
             background: var(--rosa-flow);
             color: var(--negro);
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
-            transform: scale(1.1);
         }
 
         .modal {
@@ -708,7 +503,6 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
             overflow-y: auto;
         }
 
@@ -726,7 +520,6 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 0 60px rgba(255, 20, 147, 0.2);
             margin: 20px 0;
         }
 
@@ -739,21 +532,6 @@
             font-size: 1.8rem;
             cursor: pointer;
             color: var(--gris);
-            transition: color 0.3s;
-        }
-
-        .modal-cerrar:hover {
-            color: var(--rosa-flow);
-            text-shadow: 0 0 10px var(--rosa-flow);
-        }
-
-        .modal-box h3 {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.6rem;
-            margin-bottom: 25px;
-            text-align: center;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
         }
 
         .form-group {
@@ -767,53 +545,18 @@
             color: var(--gris);
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-weight: 500;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px;
             border: 2px solid rgba(255, 20, 147, 0.2);
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.5);
             color: var(--blanco);
             font-size: 0.9rem;
-            font-family: 'Space Grotesk', sans-serif;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--rosa-flow);
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
-        }
-
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--rosa-flow);
         }
 
         .btn-primario {
@@ -825,17 +568,8 @@
             border-radius: 12px;
             font-size: 0.9rem;
             font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
             cursor: pointer;
-            font-family: 'Space Grotesk', sans-serif;
-            transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
-        }
-
-        .btn-primario:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+            text-transform: uppercase;
         }
 
         .btn-sec {
@@ -845,31 +579,9 @@
             padding: 10px 20px;
             border-radius: 10px;
             font-size: 0.75rem;
-            font-weight: 600;
             cursor: pointer;
             margin-right: 8px;
             margin-bottom: 10px;
-            font-family: 'Space Grotesk', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-        }
-
-        .btn-sec:hover {
-            border-color: var(--rosa-flow);
-            color: var(--rosa-flow);
-            box-shadow: 0 0 15px rgba(255, 20, 147, 0.2);
-        }
-
-        .btn-danger {
-            border-color: #ff4444;
-            color: #ff4444;
-        }
-
-        .btn-danger:hover {
-            background: #ff4444;
-            color: var(--blanco);
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
         }
 
         .admin-panel { display: none; }
@@ -893,15 +605,11 @@
             cursor: pointer;
             font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            border-bottom: 2px solid transparent;
         }
 
-        .admin-tab:hover,
         .admin-tab.activo {
             color: var(--rosa-flow);
-            border-bottom-color: var(--rosa-flow);
+            border-bottom: 2px solid var(--rosa-flow);
         }
 
         .admin-content {
@@ -928,19 +636,18 @@
         }
 
         .stat-number {
-            font-family: 'Syne', sans-serif;
             font-size: 2rem;
             font-weight: 700;
             color: var(--rosa-flow);
-            text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
         }
 
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--gris);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
+        .form-admin {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 20, 147, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            display: none;
         }
 
         .admin-item {
@@ -952,141 +659,33 @@
             border: 1px solid rgba(255, 20, 147, 0.15);
             border-radius: 12px;
             margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .admin-item:hover {
-            border-color: rgba(255, 20, 147, 0.4);
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.1);
-        }
-
-        .admin-item.destacado {
-            border-color: var(--rosa-flow);
-            background: rgba(255, 20, 147, 0.1);
-        }
-
-        .admin-item.agotado {
-            opacity: 0.6;
-        }
-
-        .admin-item strong {
-            color: var(--blanco);
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .admin-item small {
-            color: var(--gris);
-        }
-
-        .admin-badges {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
-        .mini-badge {
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 100px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .mini-badge.destacado {
-            background: var(--rosa-flow);
-            color: var(--negro);
-        }
-
-        .mini-badge.agotado {
-            background: #444;
-            color: var(--blanco);
-        }
-
-        .btn-edit, .btn-delete, .btn-toggle {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-family: 'Space Grotesk', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
         }
 
         .btn-edit {
             background: var(--rosa-flow);
             color: var(--negro);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
             margin-right: 5px;
-            box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
-        }
-
-        .btn-edit:hover {
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.5);
-        }
-
-        .btn-toggle {
-            background: transparent;
-            color: var(--gris);
-            border: 1px solid rgba(255, 20, 147, 0.3);
-            margin-right: 5px;
-        }
-
-        .btn-toggle:hover,
-        .btn-toggle.activo {
-            border-color: var(--rosa-flow);
-            color: var(--rosa-flow);
         }
 
         .btn-delete {
             background: transparent;
             color: #ff4444;
             border: 1px solid #ff4444;
-        }
-
-        .btn-delete:hover {
-            background: #ff4444;
-            color: var(--blanco);
-            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
-        }
-
-        .form-admin {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 20, 147, 0.2);
-            border-radius: 16px;
-            padding: 25px;
-            margin: 20px 0;
-            display: none;
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.1);
-        }
-
-        .export-section {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px dashed rgba(255, 20, 147, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .export-section p {
-            color: var(--gris);
-            font-size: 0.85rem;
-            margin-bottom: 15px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
-            .logo-img { width: 160px; height: 160px; }
-            .logo-ring:nth-child(2) { display: none; }
-            nav { gap: 15px; padding: 15px; margin: 0 15px 20px; }
+            .logo-img, .logo-placeholder { width: 160px; height: 160px; }
             .sobre-mi { grid-template-columns: 1fr; padding: 30px; }
-            .sobre-mi-foto { max-width: 250px; margin: 0 auto; }
             .productos-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
-            .admin-tabs { overflow-x: auto; flex-wrap: nowrap; }
         }
     </style>
 </head>
@@ -1094,9 +693,8 @@
     <header>
         <div class="logo-container">
             <div class="logo-ring"></div>
-            <div class="logo-ring"></div>
-            <div class="logo-ring"></div>
-            <img src="logo-flow.png" alt="Collares con Flow" class="logo-img">
+            <!-- Si tenés el logo, reemplazá esto por <img src="logo.png" class="logo-img"> -->
+            <div class="logo-placeholder">🌸</div>
         </div>
         <h1>collares con flow</h1>
         <p class="tagline">by <span>florencia lopez</span></p>
@@ -1109,7 +707,7 @@
     </nav>
 
     <section id="productos" class="seccion">
-        <h2 class="titulo-seccion">catálogo <span>//</span> 2024</h2>
+        <h2 class="titulo-seccion">catálogo // <span id="anio-catalogo">2024</span></h2>
 
         <div class="filtros">
             <button class="filtro-btn activo" onclick="filtrar('todos')">todo</button>
@@ -1125,7 +723,7 @@
     <section id="sobre-mi" class="seccion">
         <div class="sobre-mi">
             <div class="sobre-mi-foto">
-                <img src="logo-flow.png" alt="Florencia">
+                <span style="font-size: 5rem;">🌸</span>
             </div>
             <div class="sobre-mi-texto">
                 <h3>hola, soy flor ✌️</h3>
@@ -1141,19 +739,13 @@
         <p>consultá por piezas personalizadas o stock</p>
         <div class="contacto-grid">
             <div class="contacto-item">
-                <a href="https://wa.me/5490000000000" target="_blank" id="link-wa">
-                    💬 whatsapp
-                </a>
+                <a href="https://wa.me/5490000000000" target="_blank" id="link-wa">💬 whatsapp</a>
             </div>
             <div class="contacto-item">
-                <a href="https://instagram.com" target="_blank" id="link-ig">
-                    📷 instagram
-                </a>
+                <a href="https://instagram.com" target="_blank" id="link-ig">📷 instagram</a>
             </div>
             <div class="contacto-item">
-                <a href="mailto:flor@email.com" id="link-email">
-                    ✉️ email
-                </a>
+                <a href="mailto:flor@email.com" id="link-email">✉️ email</a>
             </div>
         </div>
     </section>
@@ -1176,19 +768,19 @@
                 </div>
                 <div class="form-group">
                     <label>contraseña</label>
-                    <input type="password" id="pass" placeholder="•••••••••••">
+                    <input type="password" id="pass" placeholder="contraseña">
                 </div>
                 <button class="btn-primario" onclick="login()">entrar</button>
-                <p id="login-error" style="color: #ff4444; text-align: center; margin-top: 15px; display: none;">usuario o contraseña incorrectos</p>
+                <p id="login-error" style="color: #ff4444; text-align: center; margin-top: 15px; display: none;"></p>
             </div>
 
             <div class="admin-panel" id="panel">
                 <h3>⚡ panel de control</h3>
                 
                 <div class="admin-tabs">
-                    <button class="admin-tab activo" onclick="cambiarTab('productos')">productos</button>
-                    <button class="admin-tab" onclick="cambiarTab('negocio')">negocio</button>
-                    <button class="admin-tab" onclick="cambiarTab('datos')">datos</button>
+                    <button class="admin-tab activo" onclick="cambiarTab('productos', this)">productos</button>
+                    <button class="admin-tab" onclick="cambiarTab('config', this)">config</button>
+                    <button class="admin-tab" onclick="cambiarTab('datos', this)">datos</button>
                 </div>
 
                 <!-- TAB PRODUCTOS -->
@@ -1196,19 +788,11 @@
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number" id="stat-total">0</div>
-                            <div class="stat-label">total productos</div>
+                            <div class="stat-label">productos</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number" id="stat-destacados">0</div>
                             <div class="stat-label">destacados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="stat-agotados">0</div>
-                            <div class="stat-label">agotados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="stat-valor">$0</div>
-                            <div class="stat-label">valor stock</div>
                         </div>
                     </div>
 
@@ -1217,7 +801,7 @@
                     <div class="form-admin" id="form">
                         <input type="hidden" id="pid">
                         <div class="form-group">
-                            <label>nombre del producto</label>
+                            <label>nombre</label>
                             <input type="text" id="nombre" placeholder="ej: collar luna">
                         </div>
                         <div class="form-group">
@@ -1234,70 +818,57 @@
                             <input type="number" id="precio" placeholder="0">
                         </div>
                         <div class="form-group">
-                            <label>url de la foto (opcional)</label>
-                            <input type="text" id="foto" placeholder="https://...">
-                        </div>
-                        <div class="form-group">
-                            <label>link de mercadopago (opcional)</label>
+                            <label>link mercadopago</label>
                             <input type="text" id="mp" placeholder="https://mpago.la/...">
                         </div>
-                        <div class="form-group">
-                            <label>descripción</label>
-                            <textarea id="descripcion" placeholder="detalles del producto..."></textarea>
-                        </div>
-                        <div class="checkbox-group">
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="chk-destacado">
-                                <span>destacar</span>
+                        <div class="checkbox-group" style="margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="chk-destacado" style="width: 20px; height: 20px;">
+                                <span>destacar producto</span>
                             </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="chk-agotado">
-                                <span>agotado</span>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-left: 20px;">
+                                <input type="checkbox" id="chk-agotado" style="width: 20px; height: 20px;">
+                                <span>marcar agotado</span>
                             </label>
                         </div>
-                        <button class="btn-primario" onclick="guardar()" style="margin-top: 20px;">guardar producto</button>
+                        <button class="btn-primario" onclick="guardar()">guardar</button>
                         <button class="btn-sec" onclick="cancelar()" style="margin-top: 10px; width: 100%;">cancelar</button>
                     </div>
 
                     <div id="lista"></div>
                 </div>
 
-                <!-- TAB NEGOCIO -->
-                <div class="admin-content" id="tab-negocio">
-                    <h4 style="margin-bottom: 20px; color: var(--gris);">datos de contacto</h4>
+                <!-- TAB CONFIG -->
+                <div class="admin-content" id="tab-config">
                     <div class="form-group">
-                        <label>número de whatsapp</label>
+                        <label>año del catálogo</label>
+                        <input type="number" id="config-anio" value="2024">
+                    </div>
+                    <div class="form-group">
+                        <label>whatsapp</label>
                         <input type="text" id="config-wa" placeholder="5490000000000">
                     </div>
                     <div class="form-group">
-                        <label>usuario de instagram</label>
+                        <label>instagram</label>
                         <input type="text" id="config-ig" placeholder="@usuario">
                     </div>
                     <div class="form-group">
                         <label>email</label>
                         <input type="email" id="config-email" placeholder="email@ejemplo.com">
                     </div>
-                    <div class="form-group">
-                        <label>mensaje personalizado de whatsapp</label>
-                        <textarea id="config-msj" placeholder="hola! me interesa el producto: "></textarea>
-                    </div>
-                    <button class="btn-primario" onclick="guardarConfig()">guardar cambios</button>
+                    <button class="btn-primario" onclick="guardarConfig()">guardar</button>
                 </div>
 
                 <!-- TAB DATOS -->
                 <div class="admin-content" id="tab-datos">
-                    <div class="export-section">
-                        <p>📦 exportá todos tus productos para hacer backup</p>
-                        <button class="btn-sec" onclick="exportarDatos()">📥 exportar JSON</button>
+                    <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,20,147,0.3); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px;">
+                        <p style="color: var(--gris); margin-bottom: 15px;">📥 exportar todos los datos</p>
+                        <button class="btn-sec" onclick="exportarDatos()">descargar JSON</button>
                     </div>
-                    <div class="export-section" style="margin-top: 15px;">
-                        <p>📤 importá productos desde un archivo JSON</p>
+                    <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,20,147,0.3); border-radius: 12px; padding: 20px; text-align: center;">
+                        <p style="color: var(--gris); margin-bottom: 15px;">📤 importar datos</p>
                         <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importarDatos(this)">
-                        <button class="btn-sec" onclick="document.getElementById('import-file').click()">📤 seleccionar archivo</button>
-                    </div>
-                    <div class="export-section" style="margin-top: 15px;">
-                        <p>⚠️ borrar todos los datos (no se puede deshacer)</p>
-                        <button class="btn-sec btn-danger" onclick="resetearTodo()">🗑️ borrar todo</button>
+                        <button class="btn-sec" onclick="document.getElementById('import-file').click()">seleccionar archivo</button>
                     </div>
                 </div>
 
@@ -1308,81 +879,32 @@
 
     <script>
         // ============================================
-        // SEGURIDAD - Credenciales ofuscadas
+        // CREDENCIALES
         // ============================================
-        (function() {
-            // Ofuscar credenciales para que no se vean fácil en código fuente
-            const _u = ['RmxvcmVuY2NpTG9wZXo=']; // FlorenciLopez en base64
-            const _p = ['RXN0b3lyZWxvcXVpdGE=']; // Estoyreloquita en base64
-            
-            // Verificar sesión al cargar
-            window.addEventListener('load', function() {
-                // Limpiar cualquier sesión inválida
-                const token = sessionStorage.getItem('flor_auth');
-                if (token && !verificarToken(token)) {
-                    sessionStorage.removeItem('flor_auth');
-                }
-                
-                // Prevenir acceso desde consola
-                Object.defineProperty(window, 'credenciales', {
-                    get: function() {
-                        console.clear();
-                        console.log('%c🚫 Acceso denegado', 'color: #ff1493; font-size: 20px; font-weight: bold;');
-                        console.log('%cLas credenciales están protegidas', 'color: #888;');
-                        return null;
-                    },
-                    configurable: false
-                });
-            });
-            
-            // Función para decodificar y verificar
-            window._verificarCredenciales = function(usuario, password) {
-                const userValido = atob(_u[0]) === usuario;
-                const passValido = atob(_p[0]) === password;
-                return userValido && passValido;
-            };
-            
-            // Generar token de sesión
-            window._generarToken = function() {
-                const timestamp = Date.now();
-                const random = Math.random().toString(36).substring(7);
-                return btoa(timestamp + ':' + random + ':' + atob(_u[0]));
-            };
-            
-            // Verificar token
-            window.verificarToken = function(token) {
-                try {
-                    const decoded = atob(token);
-                    const parts = decoded.split(':');
-                    if (parts.length !== 3) return false;
-                    if (parts[2] !== atob(_u[0])) return false;
-                    const timestamp = parseInt(parts[0]);
-                    // Token válido por 2 horas
-                    return (Date.now() - timestamp) < (2 * 60 * 60 * 1000);
-                } catch(e) {
-                    return false;
-                }
-            };
-        })();
+        const USERNAME = 'FlorenciLopez';
+        const PASSWORD = 'Estoyreloquita';
 
         // ============================================
         // CONFIGURACIÓN
         // ============================================
         let config = JSON.parse(localStorage.getItem('flor_config')) || {
+            anio: '2024',
             whatsapp: '5490000000000',
             instagram: '@florencialopez',
-            email: 'flor@email.com',
-            mensaje: 'hola flor! me interesa el'
+            email: 'flor@email.com'
         };
+
+        // Cargar año
+        document.getElementById('anio-catalogo').textContent = config.anio;
 
         // ============================================
         // PRODUCTOS
         // ============================================
         let productos = JSON.parse(localStorage.getItem('flor_productos')) || [
-            { id: 1, nombre: 'collar tattoo rose', categoria: 'collares', precio: 3500, destacado: true, agotado: false, foto: '', descripcion: '', mp: '' },
-            { id: 2, nombre: 'aros minimal black', categoria: 'aros', precio: 1800, destacado: false, agotado: false, foto: '', descripcion: '', mp: '' },
-            { id: 3, nombre: 'pulsera onda', categoria: 'pulseras', precio: 2200, destacado: false, agotado: false, foto: '', descripcion: '', mp: '' },
-            { id: 4, nombre: 'anillo floral', categoria: 'anillos', precio: 2800, destacado: false, agotado: true, foto: '', descripcion: '', mp: '' }
+            { id: 1, nombre: 'collar tattoo rose', categoria: 'collares', precio: 3500, destacado: true, agotado: false, mp: '' },
+            { id: 2, nombre: 'aros minimal black', categoria: 'aros', precio: 1800, destacado: false, agotado: false, mp: '' },
+            { id: 3, nombre: 'pulsera onda', categoria: 'pulseras', precio: 2200, destacado: false, agotado: false, mp: '' },
+            { id: 4, nombre: 'anillo floral', categoria: 'anillos', precio: 2800, destacado: false, agotado: true, mp: '' }
         ];
 
         let filtroActivo = 'todos';
@@ -1392,13 +914,16 @@
         }
 
         function guardarConfig() {
+            config.anio = document.getElementById('config-anio').value || '2024';
             config.whatsapp = document.getElementById('config-wa').value || config.whatsapp;
             config.instagram = document.getElementById('config-ig').value || config.instagram;
             config.email = document.getElementById('config-email').value || config.email;
-            config.mensaje = document.getElementById('config-msj').value || config.mensaje;
             localStorage.setItem('flor_config', JSON.stringify(config));
+            
+            // Actualizar en tiempo real
+            document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarLinks();
-            mostrarNotificacion('configuración guardada ✓');
+            alert('configuración guardada ✓');
         }
 
         function actualizarLinks() {
@@ -1407,63 +932,31 @@
             document.getElementById('link-email').href = `mailto:${config.email}`;
         }
 
-        function mostrarNotificacion(mensaje) {
-            const notif = document.createElement('div');
-            notif.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--rosa-flow);
-                color: var(--negro);
-                padding: 15px 25px;
-                border-radius: 12px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 0 30px rgba(255, 20, 147, 0.5);
-                animation: slideIn 0.3s ease;
-            `;
-            notif.textContent = mensaje;
-            document.body.appendChild(notif);
-            setTimeout(() => {
-                notif.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notif.remove(), 300);
-            }, 3000);
-        }
-
         function render() {
             const grid = document.getElementById('grid');
             let items = filtroActivo === 'todos' 
                 ? productos 
                 : productos.filter(p => p.categoria === filtroActivo);
 
-            // Mostrar destacados primero
             items.sort((a, b) => (b.destacado ? 1 : 0) - (a.destacado ? 1 : 0));
 
             grid.innerHTML = items.map(p => {
-                let badge = '';
-                if (p.destacado) badge = '<div class="producto-badge">🔥 destacado</div>';
+                let badge = p.destacado ? '<div class="producto-badge">🔥 destacado</div>' : '';
                 if (p.agotado) badge = '<div class="producto-badge agotado">agotado</div>';
                 
-                let botones = '';
-                if (p.agotado) {
-                    botones = `<button class="btn-consultar btn-agotado">agotado 😔</button>`;
-                } else {
-                    botones = `
-                        <div class="producto-botones">
-                            <button class="btn-consultar" onclick="consultar('${p.nombre}')">consultar 💬</button>
-                            ${p.mp ? `<button class="btn-comprar" onclick="window.open('${p.mp}', '_blank')">comprar 💳</button>` : ''}
-                        </div>
-                    `;
-                }
+                let botones = p.agotado 
+                    ? '<button class="btn-consultar btn-agotado">agotado 😔</button>'
+                    : `<div class="producto-botones">
+                        <button class="btn-consultar" onclick="consultar('${p.nombre}')">consultar 💬</button>
+                        ${p.mp ? `<button class="btn-comprar" onclick="window.open('${p.mp}', '_blank')">comprar 💳</button>` : ''}
+                       </div>`;
                 
                 return `
                 <div class="producto-card">
                     ${badge}
                     <div class="producto-img">
-                        ${p.foto ? `<img src="${p.foto}" alt="${p.nombre}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                        <div class="placeholder" ${p.foto ? 'style="display:none"' : ''}>
+                        <div class="placeholder">
                             <span class="placeholder-icon">📷</span>
-                            <span>sin foto</span>
                         </div>
                     </div>
                     <div class="producto-info">
@@ -1472,8 +965,8 @@
                         <div class="producto-precio">$${p.precio.toLocaleString()}</div>
                         ${botones}
                     </div>
-                </div>
-            `}).join('');
+                </div>`;
+            }).join('');
         }
 
         function filtrar(cat) {
@@ -1488,125 +981,66 @@
         }
 
         function consultar(nombre) {
-            const msg = `${config.mensaje} ${nombre}`;
+            const msg = `hola! me interesa el ${nombre}`;
             window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function actualizarStats() {
-            document.getElementById('stat-total').textContent = productos.length;
-            document.getElementById('stat-destacados').textContent = productos.filter(p => p.destacado).length;
-            document.getElementById('stat-agotados').textContent = productos.filter(p => p.agotado).length;
-            const totalValor = productos.reduce((sum, p) => sum + p.precio, 0);
-            document.getElementById('stat-valor').textContent = '$' + totalValor.toLocaleString();
-        }
-
         // ============================================
-        // ADMIN - LOGIN SEGURO
+        // ADMIN
         // ============================================
-        let intentosFallidos = 0;
-        const MAX_INTENTOS = 5;
-
         function abrirModal() { 
-            // Verificar si ya hay sesión válida
-            const token = sessionStorage.getItem('flor_auth');
-            if (token && verificarToken(token)) {
-                document.getElementById('modal').classList.add('activo');
-                document.getElementById('login').classList.add('oculto');
-                document.getElementById('panel').classList.add('activo');
-                cargarPanelAdmin();
-            } else {
-                document.getElementById('modal').classList.add('activo');
-                document.getElementById('login').classList.remove('oculto');
-                document.getElementById('panel').classList.remove('activo');
-            }
+            document.getElementById('modal').classList.add('activo');
             document.body.style.overflow = 'hidden';
         }
         
         function cerrarModal() { 
             document.getElementById('modal').classList.remove('activo');
             document.body.style.overflow = '';
-            setTimeout(logout, 200);
+            logout();
         }
 
         function login() {
-            // Verificar intentos fallidos
-            const bloqueo = localStorage.getItem('flor_bloqueo');
-            if (bloqueo) {
-                const tiempoRestante = parseInt(bloqueo) - Date.now();
-                if (tiempoRestante > 0) {
-                    const minutos = Math.ceil(tiempoRestante / 60000);
-                    mostrarError(`demasiados intentos. esperá ${minutos} minutos`);
-                    return;
-                } else {
-                    localStorage.removeItem('flor_bloqueo');
-                    intentosFallidos = 0;
-                }
-            }
-
             const user = document.getElementById('usuario').value.trim();
             const pass = document.getElementById('pass').value;
             
-            // Usar función segura de verificación
-            if (_verificarCredenciales(user, pass)) {
-                // Login exitoso
-                intentosFallidos = 0;
-                const token = _generarToken();
-                sessionStorage.setItem('flor_auth', token);
-                
+            if (user === USERNAME && pass === PASSWORD) {
                 document.getElementById('login').classList.add('oculto');
                 document.getElementById('panel').classList.add('activo');
                 document.getElementById('usuario').value = '';
                 document.getElementById('pass').value = '';
                 document.getElementById('login-error').style.display = 'none';
                 
-                cargarPanelAdmin();
+                // Cargar valores
+                document.getElementById('config-anio').value = config.anio;
+                document.getElementById('config-wa').value = config.whatsapp;
+                document.getElementById('config-ig').value = config.instagram;
+                document.getElementById('config-email').value = config.email;
+                
+                actualizarStats();
+                renderAdmin();
             } else {
-                // Login fallido
-                intentosFallidos++;
-                if (intentosFallidos >= MAX_INTENTOS) {
-                    const bloqueoHasta = Date.now() + (15 * 60 * 1000); // 15 minutos
-                    localStorage.setItem('flor_bloqueo', bloqueoHasta.toString());
-                    mostrarError('demasiados intentos. cuenta bloqueada por 15 minutos');
-                } else {
-                    mostrarError(`usuario o contraseña incorrectos (${intentosFallidos}/${MAX_INTENTOS})`);
-                }
+                document.getElementById('login-error').textContent = 'usuario o contraseña incorrectos';
+                document.getElementById('login-error').style.display = 'block';
             }
         }
 
-        function mostrarError(msg) {
-            const errorEl = document.getElementById('login-error');
-            errorEl.textContent = msg;
-            errorEl.style.display = 'block';
-            setTimeout(() => {
-                errorEl.style.display = 'none';
-            }, 5000);
-        }
-
-        function cargarPanelAdmin() {
-            // Cargar config
-            document.getElementById('config-wa').value = config.whatsapp;
-            document.getElementById('config-ig').value = config.instagram;
-            document.getElementById('config-email').value = config.email;
-            document.getElementById('config-msj').value = config.mensaje;
-            
-            actualizarStats();
-            renderAdmin();
-        }
-
         function logout() {
-            sessionStorage.removeItem('flor_auth');
             document.getElementById('login').classList.remove('oculto');
             document.getElementById('panel').classList.remove('activo');
             document.getElementById('form').style.display = 'none';
-            cambiarTab('productos');
         }
 
-        function cambiarTab(tab) {
+        function cambiarTab(tab, btn) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('activo'));
             document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('activo'));
             
-            event.target.classList.add('activo');
+            if (btn) btn.classList.add('activo');
             document.getElementById('tab-' + tab).classList.add('activo');
+        }
+
+        function actualizarStats() {
+            document.getElementById('stat-total').textContent = productos.length;
+            document.getElementById('stat-destacados').textContent = productos.filter(p => p.destacado).length;
         }
 
         function mostrarForm() {
@@ -1615,9 +1049,7 @@
             document.getElementById('nombre').value = '';
             document.getElementById('cat').value = 'collares';
             document.getElementById('precio').value = '';
-            document.getElementById('foto').value = '';
             document.getElementById('mp').value = '';
-            document.getElementById('descripcion').value = '';
             document.getElementById('chk-destacado').checked = false;
             document.getElementById('chk-agotado').checked = false;
         }
@@ -1627,45 +1059,23 @@
             const nombre = document.getElementById('nombre').value.trim().toLowerCase();
             const cat = document.getElementById('cat').value;
             const precio = parseFloat(document.getElementById('precio').value);
-            const foto = document.getElementById('foto').value.trim();
             const mp = document.getElementById('mp').value.trim();
-            const descripcion = document.getElementById('descripcion').value.trim();
             const destacado = document.getElementById('chk-destacado').checked;
             const agotado = document.getElementById('chk-agotado').checked;
 
             if (!nombre || !precio) {
-                mostrarNotificacion('completá nombre y precio');
+                alert('completá nombre y precio');
                 return;
             }
 
             if (id) {
                 const i = productos.findIndex(p => p.id == id);
                 if (i >= 0) {
-                    productos[i] = { 
-                        ...productos[i], 
-                        nombre, 
-                        categoria: cat, 
-                        precio, 
-                        foto, 
-                        mp,
-                        descripcion,
-                        destacado,
-                        agotado 
-                    };
+                    productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado };
                 }
             } else {
                 const newId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-                productos.push({ 
-                    id: newId, 
-                    nombre, 
-                    categoria: cat, 
-                    precio, 
-                    foto,
-                    mp,
-                    descripcion,
-                    destacado,
-                    agotado
-                });
+                productos.push({ id: newId, nombre, categoria: cat, precio, mp, destacado, agotado });
             }
 
             guardar();
@@ -1673,7 +1083,6 @@
             actualizarStats();
             renderAdmin();
             cancelar();
-            mostrarNotificacion('producto guardado ✓');
         }
 
         function editar(id) {
@@ -1683,43 +1092,20 @@
                 document.getElementById('nombre').value = p.nombre;
                 document.getElementById('cat').value = p.categoria;
                 document.getElementById('precio').value = p.precio;
-                document.getElementById('foto').value = p.foto || '';
                 document.getElementById('mp').value = p.mp || '';
-                document.getElementById('descripcion').value = p.descripcion || '';
                 document.getElementById('chk-destacado').checked = p.destacado || false;
                 document.getElementById('chk-agotado').checked = p.agotado || false;
                 document.getElementById('form').style.display = 'block';
             }
         }
 
-        function toggleDestacado(id) {
-            const p = productos.find(x => x.id === id);
-            if (p) {
-                p.destacado = !p.destacado;
-                guardar();
-                render();
-                renderAdmin();
-            }
-        }
-
-        function toggleAgotado(id) {
-            const p = productos.find(x => x.id === id);
-            if (p) {
-                p.agotado = !p.agotado;
-                guardar();
-                render();
-                renderAdmin();
-            }
-        }
-
         function eliminar(id) {
-            if (confirm('¿segura que querés borrar este producto?')) {
+            if (confirm('¿borrar este producto?')) {
                 productos = productos.filter(p => p.id !== id);
                 guardar();
                 render();
                 actualizarStats();
                 renderAdmin();
-                mostrarNotificacion('producto eliminado');
             }
         }
 
@@ -1728,40 +1114,27 @@
         }
 
         function renderAdmin() {
-            document.getElementById('lista').innerHTML = productos.map(p => {
-                let clases = 'admin-item';
-                if (p.destacado) clases += ' destacado';
-                if (p.agotado) clases += ' agotado';
-                
-                let badges = '';
-                if (p.destacado) badges += '<span class="mini-badge destacado">destacado</span>';
-                if (p.agotado) badges += '<span class="mini-badge agotado">agotado</span>';
-                if (p.mp) badges += '<span class="mini-badge" style="background: #00d084; color: #000;">MP</span>';
-                
-                return `
-                <div class="${clases}">
+            document.getElementById('lista').innerHTML = productos.map(p => `
+                <div class="admin-item">
                     <div>
                         <strong>${p.nombre}</strong>
-                        <div class="admin-badges">${badges}</div>
-                        <small>$${p.precio.toLocaleString()} · ${p.categoria}${p.foto ? ' · 📷' : ''}</small>
+                        <small style="display: block; color: #888; margin-top: 5px;">
+                            $${p.precio} · ${p.categoria}
+                            ${p.destacado ? ' · ⭐' : ''}
+                            ${p.agotado ? ' · 🚫' : ''}
+                            ${p.mp ? ' · 💳' : ''}
+                        </small>
                     </div>
                     <div>
-                        <button class="btn-toggle ${p.destacado ? 'activo' : ''}" onclick="toggleDestacado(${p.id})" title="destacar">⭐</button>
-                        <button class="btn-toggle ${p.agotado ? 'activo' : ''}" onclick="toggleAgotado(${p.id})" title="agotado">🚫</button>
                         <button class="btn-edit" onclick="editar(${p.id})">editar</button>
                         <button class="btn-delete" onclick="eliminar(${p.id})">borrar</button>
                     </div>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
         function exportarDatos() {
-            const data = {
-                productos: productos,
-                config: config,
-                fecha: new Date().toISOString(),
-                version: '2.0'
-            };
+            const data = { productos, config, fecha: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1769,7 +1142,6 @@
             a.download = `collares-con-flow-backup-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            mostrarNotificacion('backup descargado ✓');
         }
 
         function importarDatos(input) {
@@ -1780,68 +1152,30 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (data.productos && Array.isArray(data.productos)) {
-                        if (confirm(`vas a importar ${data.productos.length} productos. ¿reemplazar los actuales?`)) {
-                            productos = data.productos;
-                            guardar();
-                            if (data.config) {
-                                config = { ...config, ...data.config };
-                                localStorage.setItem('flor_config', JSON.stringify(config));
-                                actualizarLinks();
-                            }
-                            render();
-                            actualizarStats();
-                            renderAdmin();
-                            mostrarNotificacion('datos importados ✓');
-                        }
-                    } else {
-                        alert('archivo inválido: no se encontraron productos');
+                    if (data.productos && confirm(`importar ${data.productos.length} productos?`)) {
+                        productos = data.productos;
+                        if (data.config) config = { ...config, ...data.config };
+                        guardar();
+                        localStorage.setItem('flor_config', JSON.stringify(config));
+                        document.getElementById('anio-catalogo').textContent = config.anio;
+                        render();
+                        actualizarStats();
+                        renderAdmin();
+                        alert('datos importados ✓');
                     }
                 } catch (err) {
-                    alert('error al importar: archivo corrupto');
+                    alert('archivo inválido');
                 }
             };
             reader.readAsText(file);
             input.value = '';
         }
 
-        function resetearTodo() {
-            if (confirm('⚠️ ¡ATENCIÓN! Esto borrará TODOS los productos y la configuración. ¿Estás segura?')) {
-                if (confirm('¿Realmente segura? Esta acción NO se puede deshacer.')) {
-                    productos = [];
-                    config = {
-                        whatsapp: '5490000000000',
-                        instagram: '@florencialopez',
-                        email: 'flor@email.com',
-                        mensaje: 'hola flor! me interesa el'
-                    };
-                    guardar();
-                    localStorage.setItem('flor_config', JSON.stringify(config));
-                    render();
-                    actualizarLinks();
-                    actualizarStats();
-                    renderAdmin();
-                    mostrarNotificacion('todos los datos borrados');
-                }
-            }
-        }
-
-        // Prevenir acceso a variables desde consola
-        Object.freeze(productos);
-        Object.freeze(config);
-
         // INICIALIZAR
         render();
         actualizarLinks();
         document.getElementById('modal').addEventListener('click', e => {
             if (e.target.id === 'modal') cerrarModal();
-        });
-
-        // Prevenir clic derecho en imágenes (opcional, por seguridad)
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.tagName === 'IMG' && e.target.classList.contains('logo-img')) {
-                e.preventDefault();
-            }
         });
     </script>
 </body>
