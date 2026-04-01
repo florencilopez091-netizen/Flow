@@ -7,6 +7,8 @@
     <!-- FAVICON FLOR NEGRA -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 20 C55 35 70 35 75 50 C80 55 75 70 60 75 C65 85 55 90 50 85 C45 90 35 85 40 75 C25 70 20 55 25 50 C30 35 45 35 50 20' fill='%23000' stroke='%23ff1493' stroke-width='2'/><circle cx='50' cy='55' r='8' fill='%23ff1493'/></svg>" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1517,7 +1519,20 @@
                 </div>
 
                 <div class="admin-content" id="tab-herramientas">
-                    <h4 style="margin-bottom: 20px; color: var(--gris);">🔧 acciones rápidas</h4>
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">☁️ sincronización</h4>
+                    <div style="background: rgba(255,20,147,0.1); border: 1px solid rgba(255,20,147,0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: var(--gris); font-size: 0.85rem; margin-bottom: 10px;">
+                            Estado: <span id="estado-sync" style="color: var(--rosa-flow); font-weight: bold;">cargando...</span>
+                        </p>
+                        <button class="btn-primario" onclick="sincronizarManual()" style="width: 100%;">
+                            🔄 sincronizar ahora (sube/baja datos de la nube)
+                        </button>
+                        <p style="color: #666; font-size: 0.75rem; margin-top: 8px;">
+                            Última sincronización: <span id="ultima-sync">nunca</span>
+                        </p>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🔧 acciones rápidas</h4>
                     
                     <div class="form-group">
                         <label>🔍 buscar producto</label>
@@ -1558,6 +1573,243 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════
+        // CONFIGURACIÓN DE SUPABASE (BASE DE DATOS EN LA NUBE)
+        // ═══════════════════════════════════════════════════════════════
+        // 
+        // INSTRUCCIONES PARA CONFIGURAR:
+        // 1. Andá a https://supabase.com y creá una cuenta gratuita
+        // 2. Creá un nuevo proyecto
+        // 3. En SQL Editor, ejecutá el código que está en supabase.txt
+        // 4. Andá a Project Settings → API
+        // 5. Copiá la URL y la anon key acá abajo:
+        //
+        const SUPABASE_URL = 'https://llymnsjyalndnhdonsaw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseW1uc2p5YWxuZG5oZG9uc2F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTkwNTIsImV4cCI6MjA5MDU3NTA1Mn0.E4ksaUzE_tVGNiJT-3lawf94nkN0qTi1zE09FFasQxA';
+        
+        let supabase = null;
+        let modoOffline = false;
+        
+        // Intentar conectar con Supabase
+        try {
+            if (SUPABASE_URL.includes('TUPROYECTO') || SUPABASE_ANON_KEY.includes('TU_ANON')) {
+                console.log('⚠️ Supabase no configurado. Usando localStorage.');
+                modoOffline = true;
+            } else {
+                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Conectado a Supabase');
+            }
+        } catch (e) {
+            console.error('Error al conectar Supabase:', e);
+            modoOffline = true;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // FUNCIONES DE SINCRONIZACIÓN CON SUPABASE
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Cargar productos desde Supabase o localStorage
+        async function cargarProductos() {
+            if (supabase && !modoOffline) {
+                try {
+                    const { data, error } = await supabase
+                        .from('productos')
+                        .select(`
+                            *,
+                            categorias (nombre, slug)
+                        `)
+                        .eq('activo', true)
+                        .order('destacado', { ascending: false });
+                    
+                    if (error) throw error;
+                    
+                    if (data && data.length > 0) {
+                        // Transformar datos de Supabase al formato del frontend
+                        productos = data.map(p => ({
+                            id: p.id,
+                            nombre: p.nombre,
+                            categoria: p.categorias?.slug || 'collares',
+                            precio: p.precio,
+                            destacado: p.destacado,
+                            agotado: p.agotado,
+                            mp: p.link_mercadopago || '',
+                            foto: p.foto_url || ''
+                        }));
+                        
+                        // Guardar en localStorage como caché
+                        localStorage.setItem('flor_productos', JSON.stringify(productos));
+                        console.log('✅ Productos cargados desde Supabase');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error cargando de Supabase:', e);
+                }
+            }
+            
+            // Fallback a localStorage
+            const guardados = localStorage.getItem('flor_productos');
+            if (guardados) {
+                productos = JSON.parse(guardados);
+                console.log('✅ Productos cargados desde localStorage');
+            }
+        }
+        
+        // Guardar producto en Supabase
+        async function guardarProductoSupabase(producto) {
+            if (supabase && !modoOffline) {
+                try {
+                    // Obtener el ID de la categoría
+                    const { data: catData } = await supabase
+                        .from('categorias')
+                        .select('id')
+                        .eq('slug', producto.categoria)
+                        .single();
+                    
+                    const categoria_id = catData?.id || 1;
+                    
+                    if (producto.id && producto.id < 1000000) {
+                        // Actualizar producto existente
+                        const { error } = await supabase
+                            .from('productos')
+                            .update({
+                                nombre: producto.nombre,
+                                categoria_id: categoria_id,
+                                precio: producto.precio,
+                                destacado: producto.destacado,
+                                agotado: producto.agotado,
+                                link_mercadopago: producto.mp,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', producto.id);
+                        
+                        if (error) throw error;
+                    } else {
+                        // Crear nuevo producto
+                        const { error } = await supabase
+                            .from('productos')
+                            .insert([{
+                                nombre: producto.nombre,
+                                categoria_id: categoria_id,
+                                precio: producto.precio,
+                                destacado: producto.destacado,
+                                agotado: producto.agotado,
+                                link_mercadopago: producto.mp,
+                                activo: true
+                            }]);
+                        
+                        if (error) throw error;
+                    }
+                    
+                    return true;
+                } catch (e) {
+                    console.error('Error guardando en Supabase:', e);
+                    return false;
+                }
+            }
+            return true; // Modo offline, ya se guardó en localStorage
+        }
+        
+        // Eliminar producto de Supabase
+        async function eliminarProductoSupabase(id) {
+            if (supabase && !modoOffline) {
+                try {
+                    const { error } = await supabase
+                        .from('productos')
+                        .update({ activo: false })
+                        .eq('id', id);
+                    
+                    if (error) throw error;
+                    return true;
+                } catch (e) {
+                    console.error('Error eliminando de Supabase:', e);
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Cargar configuración desde Supabase
+        async function cargarConfig() {
+            if (supabase && !modoOffline) {
+                try {
+                    const { data, error } = await supabase
+                        .from('config')
+                        .select('*')
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    if (data) {
+                        config = {
+                            anio: data.anio_catalogo?.toString() || '2024',
+                            presentacionTitulo: data.presentacion_titulo,
+                            presentacionTexto1: data.presentacion_texto1,
+                            presentacionTexto2: data.presentacion_texto2,
+                            presentacionNombre: data.presentacion_nombre,
+                            whatsapp: data.whatsapp,
+                            instagram: data.instagram,
+                            email: data.email,
+                            waMensaje: data.mensaje_wp
+                        };
+                        
+                        localStorage.setItem('flor_config', JSON.stringify(config));
+                        console.log('✅ Config cargada desde Supabase');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error cargando config de Supabase:', e);
+                }
+            }
+            
+            // Fallback a localStorage
+            const guardada = localStorage.getItem('flor_config');
+            if (guardada) {
+                config = JSON.parse(guardada);
+                console.log('✅ Config cargada desde localStorage');
+            }
+        }
+        
+        // Guardar configuración en Supabase
+        async function guardarConfigSupabase() {
+            if (supabase && !modoOffline) {
+                try {
+                    const { error } = await supabase
+                        .from('config')
+                        .update({
+                            anio_catalogo: parseInt(config.anio) || 2024,
+                            presentacion_titulo: config.presentacionTitulo,
+                            presentacion_texto1: config.presentacionTexto1,
+                            presentacion_texto2: config.presentacionTexto2,
+                            presentacion_nombre: config.presentacionNombre,
+                            whatsapp: config.whatsapp,
+                            instagram: config.instagram,
+                            email: config.email,
+                            mensaje_wp: config.waMensaje,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', 1);
+                    
+                    if (error) throw error;
+                    console.log('✅ Config guardada en Supabase');
+                    return true;
+                } catch (e) {
+                    console.error('Error guardando config en Supabase:', e);
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Sincronizar todo (para llamar periódicamente)
+        async function sincronizarTodo() {
+            await cargarProductos();
+            await cargarConfig();
+            render();
+            actualizarPresentacion();
+            actualizarLinks();
+            document.getElementById('anio-catalogo').textContent = config.anio;
+        }
+        
         const USERNAME = 'FlorenciLopez';
         const PASSWORD = 'Estoyreloquita';
 
@@ -1652,9 +1904,21 @@
 
         function guardar() {
             localStorage.setItem('flor_productos', JSON.stringify(productos));
+            // También sincronizar con Supabase en segundo plano
+            if (supabase && !modoOffline) {
+                // No esperamos la respuesta para que sea más rápido
+                guardarProductosBatch();
+            }
+        }
+        
+        // Guardar todos los productos en Supabase (para sincronización batch)
+        async function guardarProductosBatch() {
+            for (const producto of productos) {
+                await guardarProductoSupabase(producto);
+            }
         }
 
-        function guardarConfig() {
+        async function guardarConfig() {
             config.anio = document.getElementById('config-anio').value || '2024';
             config.presentacionTitulo = document.getElementById('config-presentacion-titulo').value || 'hola, soy flor ✌️';
             config.presentacionTexto1 = document.getElementById('config-presentacion-texto1').value || 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.';
@@ -1663,11 +1927,17 @@
             config.whatsapp = document.getElementById('config-wa').value || config.whatsapp;
             config.instagram = document.getElementById('config-ig').value || config.instagram;
             config.email = document.getElementById('config-email').value || config.email;
+            
+            // Guardar en localStorage
             localStorage.setItem('flor_config', JSON.stringify(config));
+            
+            // Sincronizar con Supabase
+            await guardarConfigSupabase();
+            
             document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarPresentacion();
             actualizarLinks();
-            alert('configuración guardada ✓');
+            alert('configuración guardada ✓' + (modoOffline ? ' (modo offline)' : ' y sincronizada ☁️'));
         }
 
         function actualizarLinks() {
@@ -1770,6 +2040,7 @@
                 actualizarStats();
                 actualizarStatsVisitas();
                 renderAdmin();
+                actualizarEstadoSync();
             } else {
                 document.getElementById('login-error').textContent = 'usuario o contraseña incorrectos';
                 document.getElementById('login-error').style.display = 'block';
@@ -1868,6 +2139,45 @@
             `).join('');
         }
         
+        // Función para sincronizar manualmente desde el admin
+        async function sincronizarManual() {
+            const btn = document.querySelector('button[onclick="sincronizarManual()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '🔄 sincronizando...';
+            btn.disabled = true;
+            
+            try {
+                await sincronizarTodo();
+                document.getElementById('estado-sync').textContent = modoOffline ? 'modo offline' : 'conectado ☁️';
+                document.getElementById('estado-sync').style.color = modoOffline ? '#ff6b6b' : '#00d084';
+                document.getElementById('ultima-sync').textContent = new Date().toLocaleTimeString();
+                alert('✅ sincronización completada');
+            } catch (e) {
+                alert('❌ error al sincronizar: ' + e.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+        
+        // Actualizar estado de sincronización al entrar al admin
+        function actualizarEstadoSync() {
+            const estado = document.getElementById('estado-sync');
+            const ultima = document.getElementById('ultima-sync');
+            if (estado) {
+                if (modoOffline) {
+                    estado.textContent = 'modo offline (solo local)';
+                    estado.style.color = '#ff6b6b';
+                } else {
+                    estado.textContent = 'conectado ☁️';
+                    estado.style.color = '#00d084';
+                }
+            }
+            if (ultima) {
+                ultima.textContent = new Date().toLocaleTimeString();
+            }
+        }
+        
         function duplicarUltimo() {
             if (productos.length === 0) {
                 alert('no hay productos para duplicar');
@@ -1944,7 +2254,7 @@
             document.getElementById('chk-agotado').checked = false;
         }
 
-        function guardar() {
+        async function guardar() {
             const id = document.getElementById('pid').value;
             const nombre = document.getElementById('nombre').value.trim().toLowerCase();
             const cat = document.getElementById('cat').value;
@@ -1958,17 +2268,27 @@
                 return;
             }
 
+            let productoGuardado;
             if (id) {
                 const i = productos.findIndex(p => p.id == id);
                 if (i >= 0) {
                     productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado };
+                    productoGuardado = productos[i];
                 }
             } else {
                 const newId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-                productos.push({ id: newId, nombre, categoria: cat, precio, mp, destacado, agotado });
+                productoGuardado = { id: newId, nombre, categoria: cat, precio, mp, destacado, agotado };
+                productos.push(productoGuardado);
             }
 
-            guardar();
+            // Guardar en localStorage
+            localStorage.setItem('flor_productos', JSON.stringify(productos));
+            
+            // Sincronizar con Supabase
+            if (supabase && !modoOffline && productoGuardado) {
+                await guardarProductoSupabase(productoGuardado);
+            }
+            
             render();
             actualizarStats();
             renderAdmin();
@@ -1989,10 +2309,14 @@
             }
         }
 
-        function eliminar(id) {
+        async function eliminar(id) {
             if (confirm('¿borrar este producto?')) {
                 productos = productos.filter(p => p.id !== id);
-                guardar();
+                localStorage.setItem('flor_productos', JSON.stringify(productos));
+                
+                // Sincronizar con Supabase
+                await eliminarProductoSupabase(id);
+                
                 render();
                 actualizarStats();
                 actualizarStatsVisitas();
@@ -2062,12 +2386,29 @@
             input.value = '';
         }
 
-        render();
-        actualizarPresentacion();
-        actualizarLinks();
+        // Cargar datos desde Supabase o localStorage al iniciar
+        sincronizarTodo().then(() => {
+            console.log('✅ Datos sincronizados correctamente');
+        }).catch(err => {
+            console.error('Error al sincronizar:', err);
+            // Fallback: usar datos locales
+            render();
+            actualizarPresentacion();
+            actualizarLinks();
+        });
+        
         document.getElementById('modal').addEventListener('click', e => {
             if (e.target.id === 'modal') cerrarModal();
         });
+        
+        // Sincronizar cada 30 segundos para mantener actualizado
+        setInterval(() => {
+            if (!modoOffline) {
+                cargarProductos();
+                cargarConfig();
+                console.log('🔄 Sincronización automática');
+            }
+        }, 30000);
     </script>
 </body>
 </html>
