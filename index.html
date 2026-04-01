@@ -1587,7 +1587,7 @@
         const SUPABASE_URL = 'https://llymnsjyalndnhdonsaw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseW1uc2p5YWxuZG5oZG9uc2F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTkwNTIsImV4cCI6MjA5MDU3NTA1Mn0.E4ksaUzE_tVGNiJT-3lawf94nkN0qTi1zE09FFasQxA';
         
-        let supabase = null;
+        let supabaseClient = null;
         let modoOffline = false;
         
         // Intentar conectar con Supabase
@@ -1596,7 +1596,7 @@
                 console.log('⚠️ Supabase no configurado. Usando localStorage.');
                 modoOffline = true;
             } else {
-                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Conectado a Supabase');
             }
         } catch (e) {
@@ -1610,9 +1610,9 @@
         
         // Cargar productos desde Supabase o localStorage
         async function cargarProductos() {
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('productos')
                         .select(`
                             *,
@@ -1656,10 +1656,10 @@
         
         // Guardar producto en Supabase
         async function guardarProductoSupabase(producto) {
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 try {
                     // Obtener el ID de la categoría
-                    const { data: catData } = await supabase
+                    const { data: catData } = await supabaseClient
                         .from('categorias')
                         .select('id')
                         .eq('slug', producto.categoria)
@@ -1711,9 +1711,9 @@
         
         // Eliminar producto de Supabase
         async function eliminarProductoSupabase(id) {
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('productos')
                         .update({ activo: false })
                         .eq('id', id);
@@ -1730,9 +1730,9 @@
         
         // Cargar configuración desde Supabase
         async function cargarConfig() {
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('config')
                         .select('*')
                         .single();
@@ -1771,9 +1771,9 @@
         
         // Guardar configuración en Supabase
         async function guardarConfigSupabase() {
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('config')
                         .update({
                             anio_catalogo: parseInt(config.anio) || 2024,
@@ -1905,7 +1905,7 @@
         function guardar() {
             localStorage.setItem('flor_productos', JSON.stringify(productos));
             // También sincronizar con Supabase en segundo plano
-            if (supabase && !modoOffline) {
+            if (supabaseClient && !modoOffline) {
                 // No esperamos la respuesta para que sea más rápido
                 guardarProductosBatch();
             }
