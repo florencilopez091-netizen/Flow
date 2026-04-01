@@ -663,32 +663,52 @@
             text-shadow: 0 0 10px var(--rosa-flow);
         }
 
-        /* ADMIN */
+        /* ADMIN - VERSIÓN DISCRETA PARA MÓVIL */
         .admin-btn {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 20, 147, 0.1);
-            border: 2px solid var(--rosa-flow);
-            border-radius: 16px;
-            color: var(--rosa-flow);
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: rgba(30, 30, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.3);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1rem;
             transition: all 0.3s;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.2);
+            backdrop-filter: blur(5px);
+            opacity: 0.5;
+            z-index: 100;
         }
 
         .admin-btn:hover {
-            background: var(--rosa-flow);
+            background: rgba(255, 20, 147, 0.8);
             color: var(--negro);
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+            border-color: var(--rosa-flow);
+            opacity: 1;
             transform: scale(1.1);
+        }
+
+        /* En desktop, mostrar normal pero discreto */
+        @media (min-width: 769px) {
+            .admin-btn {
+                width: 50px;
+                height: 50px;
+                background: rgba(255, 20, 147, 0.1);
+                border: 1px solid rgba(255, 20, 147, 0.3);
+                color: var(--rosa-flow);
+                opacity: 0.7;
+                font-size: 1.1rem;
+            }
+            
+            .admin-btn:hover {
+                background: var(--rosa-flow);
+                box-shadow: 0 0 30px rgba(255, 20, 147, 0.4);
+            }
         }
 
         .modal {
@@ -998,15 +1018,137 @@
             margin-bottom: 15px;
         }
 
+        /* ========== AJUSTES PARA CELULAR ========== */
         @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            .logo-img { width: 160px; height: 160px; }
-            .logo-ring:nth-child(2) { display: none; }
-            nav { gap: 15px; padding: 15px; margin: 0 15px 20px; }
-            .sobre-mi { grid-template-columns: 1fr; padding: 30px; }
-            .sobre-mi-foto { max-width: 250px; margin: 0 auto; }
-            .productos-grid { grid-template-columns: 1fr; }
+            /* Header más compacto */
+            header { padding: 20px 15px 30px; }
+            h1 { font-size: 1.8rem; letter-spacing: -1px; }
+            .tagline { font-size: 0.85rem; letter-spacing: 2px; }
+            
+            /* Logo más pequeño */
+            .logo-img { width: 140px; height: 140px; }
+            .logo-ring { display: none; } /* Ocultar anillos giratorios en móvil */
+            
+            /* Nav más compacto */
+            nav { 
+                gap: 8px; 
+                padding: 12px 10px; 
+                margin: 0 10px 15px;
+                max-width: 95%;
+                border-radius: 50px;
+            }
+            nav a { 
+                font-size: 0.7rem; 
+                letter-spacing: 1px;
+                padding: 3px 0;
+            }
+            
+            /* Secciones con menos padding */
+            .seccion { padding: 30px 15px; }
+            .titulo-seccion { font-size: 1.2rem; margin-bottom: 25px; }
+            
+            /* Filtros más compactos */
+            .filtros { gap: 8px; margin-bottom: 30px; }
+            .filtro-btn { 
+                padding: 8px 16px; 
+                font-size: 0.7rem;
+            }
+            
+            /* Productos: una sola columna bien espaciada */
+            .productos-grid { 
+                grid-template-columns: 1fr; 
+                gap: 20px;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            .producto-card { border-radius: 16px; }
+            .producto-img { height: 240px; }
+            .producto-info { padding: 20px; }
+            .producto-nombre { font-size: 1.1rem; }
+            .producto-precio { font-size: 1.1rem; }
+            .btn-consultar, .btn-comprar { 
+                padding: 12px; 
+                font-size: 0.75rem;
+            }
+            
+            /* Sobre mí: foto arriba, texto abajo */
+            .sobre-mi { 
+                grid-template-columns: 1fr; 
+                padding: 25px 20px;
+                gap: 30px;
+                border-radius: 20px;
+            }
+            .sobre-mi-foto { 
+                max-width: 200px; 
+                margin: 0 auto;
+                border-radius: 20px;
+            }
+            .sobre-mi-texto h3 { 
+                font-size: 1.6rem; 
+                text-align: center;
+            }
+            .sobre-mi-texto p { 
+                font-size: 0.95rem; 
+                line-height: 1.7;
+                text-align: center;
+            }
+            .firma { 
+                font-size: 1.2rem; 
+                text-align: center;
+            }
+            
+            /* Contacto: botones apilados */
+            .contacto-section { padding: 50px 15px; }
+            .contacto-section h2 { font-size: 1.6rem; }
+            .contacto-grid { 
+                flex-direction: column; 
+                gap: 12px;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            .contacto-item a { 
+                padding: 14px 20px;
+                font-size: 0.85rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Footer más chico */
+            footer { padding: 25px 15px; font-size: 0.75rem; }
+            
+            /* Admin panel: pantalla completa en móvil */
+            .modal-box {
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                margin: 0;
+                padding: 25px 20px;
+            }
+            .admin-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 10px;
+                gap: 5px;
+            }
+            .admin-tab {
+                font-size: 0.7rem;
+                padding: 8px 12px;
+                white-space: nowrap;
+            }
             .stats-grid { grid-template-columns: 1fr; }
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 12px;
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+        }
+        
+        /* ========== PARA PANTALLAS MUY CHICAS ========== */
+        @media (max-width: 380px) {
+            h1 { font-size: 1.5rem; }
+            .logo-img { width: 120px; height: 120px; }
+            .producto-img { height: 200px; }
+            .producto-nombre { font-size: 1rem; }
         }
     </style>
 </head>
