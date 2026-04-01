@@ -1424,6 +1424,15 @@
                             <label>link mercadopago</label>
                             <input type="text" id="mp" placeholder="https://mpago.la/...">
                         </div>
+                        <div class="form-group">
+                            <label>foto del producto</label>
+                            <input type="file" id="foto" accept="image/*" onchange="previewFoto(this)">
+                            <div id="foto-preview" style="margin-top: 10px; display: none;">
+                                <img id="foto-img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--rosa-flow);">
+                                <button type="button" onclick="eliminarFoto()" style="display: block; margin-top: 5px; background: transparent; border: 1px solid var(--rosa-flow); color: var(--rosa-flow); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">❌ quitar foto</button>
+                            </div>
+                            <input type="hidden" id="foto-base64">
+                        </div>
                         <div class="checkbox-group">
                             <label class="checkbox-item">
                                 <input type="checkbox" id="chk-destacado">
@@ -1744,28 +1753,28 @@
                     const categorias = await supabaseGet('categorias', 'slug=eq.' + producto.categoria);
                     const categoria_id = categorias[0]?.id || 1;
                     
+                    // Preparar datos del producto (foto_url solo si no es muy grande)
+                    const datosProducto = {
+                        nombre: producto.nombre,
+                        categoria_id: categoria_id,
+                        precio: producto.precio,
+                        destacado: producto.destacado,
+                        agotado: producto.agotado,
+                        link_mercadopago: producto.mp,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    // Solo incluir foto si existe y no es muy grande (< 100KB aprox)
+                    if (producto.foto && producto.foto.length < 100000) {
+                        datosProducto.foto_url = producto.foto;
+                    }
+                    
                     if (producto.id && producto.id < 1000000) {
                         // Actualizar producto existente
-                        await supabasePatch('productos', producto.id, {
-                            nombre: producto.nombre,
-                            categoria_id: categoria_id,
-                            precio: producto.precio,
-                            destacado: producto.destacado,
-                            agotado: producto.agotado,
-                            link_mercadopago: producto.mp,
-                            updated_at: new Date().toISOString()
-                        });
+                        await supabasePatch('productos', producto.id, datosProducto);
                     } else {
                         // Crear nuevo producto
-                        await supabasePost('productos', {
-                            nombre: producto.nombre,
-                            categoria_id: categoria_id,
-                            precio: producto.precio,
-                            destacado: producto.destacado,
-                            agotado: producto.agotado,
-                            link_mercadopago: producto.mp,
-                            activo: true
-                        });
+                        await supabasePost('productos', { ...datosProducto, activo: true });
                     }
                     
                     return true;
@@ -2145,13 +2154,16 @@
                         ${p.mp ? `<button class="btn-comprar" onclick="window.open('${p.mp}', '_blank')">comprar 💳</button>` : ''}
                        </div>`;
                 
+                // Imagen del producto (foto o placeholder)
+                const imgHtml = p.foto 
+                    ? `<img src="${p.foto}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" alt="${p.nombre}">`
+                    : `<div class="placeholder"><span class="placeholder-icon">📷</span></div>`;
+                
                 return `
                 <div class="producto-card">
                     ${badge}
                     <div class="producto-img">
-                        <div class="placeholder">
-                            <span class="placeholder-icon">📷</span>
-                        </div>
+                        ${imgHtml}
                     </div>
                     <div class="producto-info">
                         <div class="producto-tag">${p.categoria}</div>
@@ -2449,6 +2461,7 @@
             document.getElementById('mp').value = '';
             document.getElementById('chk-destacado').checked = false;
             document.getElementById('chk-agotado').checked = false;
+            eliminarFoto();
         }
 
         async function guardar() {
@@ -2459,6 +2472,7 @@
             const mp = document.getElementById('mp').value.trim();
             const destacado = document.getElementById('chk-destacado').checked;
             const agotado = document.getElementById('chk-agotado').checked;
+            const foto = document.getElementById('foto-base64').value;
 
             if (!nombre || !precio) {
                 alert('completá nombre y precio');
@@ -2469,12 +2483,12 @@
             if (id) {
                 const i = productos.findIndex(p => p.id == id);
                 if (i >= 0) {
-                    productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado };
+                    productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado, foto };
                     productoGuardado = productos[i];
                 }
             } else {
                 const newId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-                productoGuardado = { id: newId, nombre, categoria: cat, precio, mp, destacado, agotado };
+                productoGuardado = { id: newId, nombre, categoria: cat, precio, mp, destacado, agotado, foto };
                 productos.push(productoGuardado);
             }
 
@@ -2524,6 +2538,16 @@
                 document.getElementById('mp').value = p.mp || '';
                 document.getElementById('chk-destacado').checked = p.destacado || false;
                 document.getElementById('chk-agotado').checked = p.agotado || false;
+                
+                // Cargar foto si existe
+                if (p.foto) {
+                    document.getElementById('foto-base64').value = p.foto;
+                    document.getElementById('foto-img').src = p.foto;
+                    document.getElementById('foto-preview').style.display = 'block';
+                } else {
+                    eliminarFoto();
+                }
+                
                 document.getElementById('form').style.display = 'block';
             }
         }
@@ -2560,28 +2584,56 @@
             }
         }
 
+        // Funciones para manejar la foto del producto
+        function previewFoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('foto-img').src = e.target.result;
+                    document.getElementById('foto-base64').value = e.target.result;
+                    document.getElementById('foto-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function eliminarFoto() {
+            document.getElementById('foto').value = '';
+            document.getElementById('foto-img').src = '';
+            document.getElementById('foto-base64').value = '';
+            document.getElementById('foto-preview').style.display = 'none';
+        }
+
         function cancelar() {
             document.getElementById('form').style.display = 'none';
         }
 
         function renderAdmin() {
-            document.getElementById('lista').innerHTML = productos.map(p => `
+            document.getElementById('lista').innerHTML = productos.map(p => {
+                const fotoPreview = p.foto 
+                    ? `<img src="${p.foto}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; border: 1px solid var(--rosa-flow);">`
+                    : `<div style="width: 40px; height: 40px; background: #333; border-radius: 4px; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📷</div>`;
+                
+                return `
                 <div class="admin-item">
-                    <div>
-                        <strong>${p.nombre}</strong>
-                        <small style="display: block; color: #888; margin-top: 5px;">
-                            $${p.precio} · ${p.categoria}
-                            ${p.destacado ? ' · ⭐' : ''}
-                            ${p.agotado ? ' · 🚫' : ''}
-                            ${p.mp ? ' · 💳' : ''}
-                        </small>
+                    <div style="display: flex; align-items: center;">
+                        ${fotoPreview}
+                        <div>
+                            <strong>${p.nombre}</strong>
+                            <small style="display: block; color: #888; margin-top: 5px;">
+                                $${p.precio} · ${p.categoria}
+                                ${p.destacado ? ' · ⭐' : ''}
+                                ${p.agotado ? ' · 🚫' : ''}
+                                ${p.mp ? ' · 💳' : ''}
+                            </small>
+                        </div>
                     </div>
                     <div>
                         <button class="btn-edit" onclick="editar(${p.id})" title="modificar producto">editar ✏️</button>
                         <button class="btn-delete" onclick="eliminar(${p.id})" title="eliminar producto permanentemente">borrar 🗑️</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function exportarDatos() {
