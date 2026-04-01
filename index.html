@@ -2357,10 +2357,12 @@
             }
         }
         
-        // Mostrar advertencia si hay problemas de CSP
-        if (modoOffline && window.location.protocol !== 'file:') {
-            console.warn('⚠️ Página funcionando en modo offline. Si querés sincronización en la nube, verificá la configuración de CSP o contactá al soporte.');
-        }
+        // Mostrar advertencia si hay problemas de CSP (después de esperar la conexión)
+        setTimeout(() => {
+            if (modoOffline && window.location.protocol !== 'file:') {
+                console.warn('⚠️ Página funcionando en modo offline. Los datos solo se guardan en este dispositivo.');
+            }
+        }, 2000);
         
         // Escuchar cambios desde otros dispositivos (sincronización en tiempo real)
         window.addEventListener('storage', (e) => {
@@ -2583,15 +2585,31 @@
         }
 
         // Cargar datos desde Supabase o localStorage al iniciar
-        sincronizarTodo().then(() => {
-            console.log('✅ Datos sincronizados correctamente');
-        }).catch(err => {
-            console.error('Error al sincronizar:', err);
-            // Fallback: usar datos locales
-            render();
-            actualizarPresentacion();
-            actualizarLinks();
-        });
+        // Esperar a que Supabase se inicialice primero
+        async function iniciarApp() {
+            // Esperar hasta 3 segundos a que Supabase se conecte
+            for (let i = 0; i < 15; i++) {
+                if (!modoOffline && supabaseClient) {
+                    console.log('✅ Supabase listo, sincronizando...');
+                    break;
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            // Ahora sincronizar
+            try {
+                await sincronizarTodo();
+                console.log('✅ Datos sincronizados correctamente');
+            } catch (err) {
+                console.error('Error al sincronizar:', err);
+                // Fallback: usar datos locales
+                render();
+                actualizarPresentacion();
+                actualizarLinks();
+            }
+        }
+        
+        iniciarApp();
         
         document.getElementById('modal').addEventListener('click', e => {
             if (e.target.id === 'modal') cerrarModal();
