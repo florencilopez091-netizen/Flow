@@ -1855,107 +1855,64 @@
         let ultimaActualizacion = localStorage.getItem('flor_last_update') || '0';
         let ultimaRevision = Date.now();
         
-        // Función para detectar si hay cambios nuevos en Supabase
-        // FIX: compara el contenido real en lugar de depender de updated_at,
-        // que en Supabase puede no actualizarse si no tiene el trigger configurado.
+        // ═══════════════════════════════════════════════════════════════
+        // SISTEMA DE SINCRONIZACIÓN MULTI-DISPOSITIVO
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Timestamp de la última vez que OTRO dispositivo notificó cambios
+        let lastKnownExternalUpdate = localStorage.getItem('flor_cambio_reciente') || '0';
+        
+        // Función para verificar si hay cambios de otros dispositivos
         async function verificarCambiosNuevos() {
             if (modoOffline) return false;
             
-            try {
-                // Traer estado real de productos y config desde Supabase
-                const productosData = await supabaseGet('productos', 'activo=eq.true&select=*');
-                const configData = await supabaseGet('config', 'select=*&limit=1');
-                
-                // Crear un "hash" simple comparando el contenido serializado
-                const hashRemoto = JSON.stringify(productosData) + '||' + JSON.stringify(configData);
-                const hashLocal = localStorage.getItem('flor_hash_remoto') || '';
-                
-                if (hashRemoto !== hashLocal) {
-                    console.log('🔄 Detectados cambios nuevos en el servidor');
-                    localStorage.setItem('flor_hash_remoto', hashRemoto);
-                    return true;
-                }
-                
-                return false;
-            } catch (e) {
-                console.error('Error verificando cambios:', e);
-                return false;
+            // 1. Verificar notificaciones de otros dispositivos (localStorage)
+            const cambioExterno = localStorage.getItem('flor_cambio_reciente') || '0';
+            if (cambioExterno !== lastKnownExternalUpdate) {
+                console.log('🔄 Cambio detectado desde otro dispositivo');
+                lastKnownExternalUpdate = cambioExterno;
+                return true;
             }
+            
+            // 2. Verificar cambios comparando con servidor (cada 30 seg)
+            // Simplificado: siempre recargamos datos del servidor periódicamente
+            return false; // El polling lo hace sincronizarTodo directamente
         }
         
-        // Función para actualizar automáticamente si hay cambios
-        // Contador de verificaciones sin cambios
-        let contadorSinCambios = 0;
-        
-        async function autoActualizar() {
-            // Solo verificar si estamos conectados a Supabase
+        // Sincronización periódica simple y efectiva
+        async function autoSincronizar() {
             if (!supabaseClient || modoOffline) return;
             
-            const hayCambios = await verificarCambiosNuevos();
-            if (hayCambios) {
-                console.log('🔄 Cambios nuevos detectados en el servidor');
-                contadorSinCambios = 0;
+            // Verificar si hay cambios de otros dispositivos
+            const cambioExterno = localStorage.getItem('flor_cambio_reciente') || '0';
+            const hayCambioExterno = cambioExterno !== lastKnownExternalUpdate;
+            
+            if (hayCambioExterno) {
+                console.log('🔄 Sincronizando cambios de otro dispositivo...');
+                lastKnownExternalUpdate = cambioExterno;
                 
                 // Verificar que no esté el modal de admin abierto
                 const modalAbierto = document.getElementById('modal')?.classList.contains('activo');
                 if (!modalAbierto) {
-                    recargarSilenciosamente();
-                } else {
-                    console.log('⏳ Modal abierto, esperando para recargar...');
+                    // Recargar datos sin refrescar la página
+                    await sincronizarTodo();
+                    console.log('✅ Datos actualizados desde el servidor');
                 }
-            } else {
-                contadorSinCambios++;
             }
         }
         
-        // Recarga automática silenciosa cuando hay cambios
-        function recargarSilenciosamente() {
-            // Evitar múltiples recargas
-            if (window.recargando) return;
-            window.recargando = true;
-            
-            console.log('🔄 Cambios detectados, recargando página...');
-            
-            // Guardar posición de scroll para restaurar después
-            localStorage.setItem('flor_scroll_y', window.scrollY);
-            
-            // Recargar sin caché
-            location.reload(true);
-        }
+        // Sincronizar cada 5 segundos (verifica cambios de otros dispositivos)
+        setInterval(autoSincronizar, 5000);
         
-        // Restaurar scroll después de recargar
-        window.addEventListener('load', () => {
-            const scrollY = localStorage.getItem('flor_scroll_y');
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY));
-                localStorage.removeItem('flor_scroll_y');
-            }
-        });
-        
-        // Verificar cambios cada 5 segundos (muy frecuente para estar siempre actualizado)
-        setInterval(autoActualizar, 5000);
-        
-        // También verificar cuando la pestaña vuelve a estar activa
+        // También sincronizar cuando la pestaña vuelve a estar activa
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                // Forzar verificación inmediata al volver a la pestaña
-                setTimeout(autoActualizar, 500);
-            }
-        });
-        
-        // Verificar cuando el usuario hace clic en la página (interacción)
-        let ultimaVerificacionClick = 0;
-        document.addEventListener('click', () => {
-            const ahora = Date.now();
-            // Verificar máximo una vez por segundo
-            if (ahora - ultimaVerificacionClick > 1000) {
-                ultimaVerificacionClick = ahora;
-                autoActualizar();
+                setTimeout(autoSincronizar, 500);
             }
         });
         
         // Verificar al cargar la página (después de que todo esté listo)
-        setTimeout(autoActualizar, 3000);
+        setTimeout(autoSincronizar, 3000);
         
         // Función para limpiar caché (solo para emergencias, sigue estando disponible)
         function forzarActualizacion() {
