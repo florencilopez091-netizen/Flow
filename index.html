@@ -10,6 +10,9 @@
     <meta http-equiv="Expires" content="0">
     <meta http-equiv="Last-Modified" content="0">
     
+    <!-- CONTENT SECURITY POLICY - Permitir todo lo necesario -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' * data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co;">
+    
     <title>Collares con Flow — by Florencia</title>
     
     <!-- SISTEMA AUTO-UPDATE: Detecta cambios automáticamente -->
@@ -18,7 +21,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 20 C55 35 70 35 75 50 C80 55 75 70 60 75 C65 85 55 90 50 85 C45 90 35 85 40 75 C25 70 20 55 25 50 C30 35 45 35 50 20' fill='%23000' stroke='%23ff1493' stroke-width='2'/><circle cx='50' cy='55' r='8' fill='%23ff1493'/></svg>" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- SUPABASE SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -1618,20 +1621,43 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseW1uc2p5YWxuZG5oZG9uc2F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTkwNTIsImV4cCI6MjA5MDU3NTA1Mn0.E4ksaUzE_tVGNiJT-3lawf94nkN0qTi1zE09FFasQxA';
         
         let supabaseClient = null;
-        let modoOffline = false;
+        let modoOffline = true; // Por defecto offline, activar Supabase solo si funciona
         
-        // Intentar conectar con Supabase
-        try {
-            if (SUPABASE_URL.includes('TUPROYECTO') || SUPABASE_ANON_KEY.includes('TU_ANON')) {
-                console.log('⚠️ Supabase no configurado. Usando localStorage.');
-                modoOffline = true;
-            } else {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Intentar conectar con Supabase (con manejo de errores CSP)
+        function inicializarSupabase() {
+            try {
+                // Verificar si el SDK cargó correctamente
+                if (typeof window.supabase === 'undefined') {
+                    console.log('⚠️ SDK de Supabase no cargado. Modo offline activado.');
+                    return;
+                }
+                
+                // Verificar si están configuradas las credenciales
+                if (SUPABASE_URL.includes('TUPROYECTO') || SUPABASE_ANON_KEY.includes('TU_ANON')) {
+                    console.log('⚠️ Supabase no configurado. Usando localStorage.');
+                    return;
+                }
+                
+                // Intentar crear cliente
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: { persistSession: false }
+                });
+                
+                modoOffline = false;
                 console.log('✅ Conectado a Supabase');
+                
+            } catch (e) {
+                console.warn('⚠️ Error CSP con Supabase, usando modo offline:', e.message);
+                supabaseClient = null;
+                modoOffline = true;
             }
-        } catch (e) {
-            console.error('Error al conectar Supabase:', e);
-            modoOffline = true;
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarSupabase);
+        } else {
+            inicializarSupabase();
         }
         
         // ═══════════════════════════════════════════════════════════════
@@ -2319,16 +2345,24 @@
             
             if (estado) {
                 if (modoOffline) {
-                    estado.textContent = 'modo offline (solo local)';
+                    estado.innerHTML = 'modo offline ⚠️<br><small>Los cambios solo se guardan en este dispositivo</small>';
                     estado.style.color = '#ff6b6b';
+                    estado.style.fontSize = '0.75rem';
+                    estado.style.lineHeight = '1.4';
                 } else {
-                    estado.textContent = 'conectado ☁️ (auto-update activo)';
+                    estado.innerHTML = 'conectado ☁️<br><small>Auto-update activo</small>';
                     estado.style.color = '#00d084';
+                    estado.style.fontSize = '0.75rem';
                 }
             }
             if (ultima) {
                 ultima.textContent = new Date().toLocaleTimeString();
             }
+        }
+        
+        // Mostrar advertencia si hay problemas de CSP
+        if (modoOffline && window.location.protocol !== 'file:') {
+            console.warn('⚠️ Página funcionando en modo offline. Si querés sincronización en la nube, verificá la configuración de CSP o contactá al soporte.');
         }
         
         // Escuchar cambios desde otros dispositivos (sincronización en tiempo real)
