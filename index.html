@@ -1628,35 +1628,53 @@
         // Función para hacer peticiones GET
         async function supabaseGet(table, query = '') {
             const url = `${SUPABASE_URL}/rest/v1/${table}${query ? '?' + query : ''}`;
+            console.log('📡 GET:', url);
             const response = await fetch(url, {
                 method: 'GET',
                 headers: getHeaders()
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            console.log('📡 GET response:', response.status);
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('📡 GET error body:', text);
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
             return await response.json();
         }
         
         // Función para hacer peticiones POST
         async function supabasePost(table, data) {
             const url = `${SUPABASE_URL}/rest/v1/${table}`;
+            console.log('📡 POST:', url, data);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            console.log('📡 POST response:', response.status);
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('📡 POST error body:', text);
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
             return await response.json();
         }
         
         // Función para hacer peticiones PATCH
         async function supabasePatch(table, id, data) {
             const url = `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`;
+            console.log('📡 PATCH:', url, data);
             const response = await fetch(url, {
                 method: 'PATCH',
                 headers: getHeaders(),
                 body: JSON.stringify(data)
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            console.log('📡 PATCH response:', response.status);
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('📡 PATCH error body:', text);
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
             return await response.json();
         }
         
@@ -1812,40 +1830,49 @@
         
         // Guardar configuración en Supabase
         async function guardarConfigSupabase() {
-            if (!modoOffline) {
-                try {
-                    // Primero verificar si existe algún registro
-                    const existente = await supabaseGet('config', 'limit=1');
-                    const datos = {
-                        anio_catalogo: parseInt(config.anio) || 2024,
-                        presentacion_titulo: config.presentacionTitulo,
-                        presentacion_texto1: config.presentacionTexto1,
-                        presentacion_texto2: config.presentacionTexto2,
-                        presentacion_nombre: config.presentacionNombre,
-                        whatsapp: config.whatsapp,
-                        instagram: config.instagram,
-                        email: config.email,
-                        mensaje_wp: config.waMensaje,
-                        updated_at: new Date().toISOString()
-                    };
-                    
-                    if (existente && existente.length > 0) {
-                        // Actualizar registro existente
-                        const id = existente[0].id;
-                        await supabasePatch('config', id, datos);
-                        console.log('✅ Config actualizada en Supabase (id:', id, ')');
-                    } else {
-                        // Crear nuevo registro
-                        await supabasePost('config', datos);
-                        console.log('✅ Config creada en Supabase');
-                    }
-                    return true;
-                } catch (e) {
-                    console.error('Error guardando config en Supabase:', e);
-                    return false;
-                }
+            console.log('🔄 Guardando config... modoOffline:', modoOffline);
+            if (modoOffline) {
+                console.log('⚠️ Modo offline activo, no se sincroniza');
+                return false;
             }
-            return true;
+            
+            try {
+                // Primero verificar si existe algún registro
+                console.log('📡 Consultando config existente...');
+                const existente = await supabaseGet('config', 'limit=1');
+                console.log('📡 Config existente:', existente);
+                
+                const datos = {
+                    anio_catalogo: parseInt(config.anio) || 2024,
+                    presentacion_titulo: config.presentacionTitulo,
+                    presentacion_texto1: config.presentacionTexto1,
+                    presentacion_texto2: config.presentacionTexto2,
+                    presentacion_nombre: config.presentacionNombre,
+                    whatsapp: config.whatsapp,
+                    instagram: config.instagram,
+                    email: config.email,
+                    mensaje_wp: config.waMensaje,
+                    updated_at: new Date().toISOString()
+                };
+                
+                if (existente && existente.length > 0) {
+                    // Actualizar registro existente
+                    const id = existente[0].id;
+                    console.log('🔄 Actualizando config id:', id);
+                    await supabasePatch('config', id, datos);
+                    console.log('✅ Config actualizada en Supabase (id:', id, ')');
+                } else {
+                    // Crear nuevo registro
+                    console.log('🔄 Creando nueva config...');
+                    await supabasePost('config', datos);
+                    console.log('✅ Config creada en Supabase');
+                }
+                return true;
+            } catch (e) {
+                console.error('❌ Error guardando config en Supabase:', e);
+                console.error('❌ Stack:', e.stack);
+                return false;
+            }
         }
         
         // Sincronizar todo (para llamar periódicamente)
