@@ -2094,9 +2094,29 @@
         }
 
         function actualizarLinks() {
-            document.getElementById('link-wa').href = `https://wa.me/${config.whatsapp}`;
-            document.getElementById('link-ig').href = `https://instagram.com/${config.instagram.replace('@', '')}`;
-            document.getElementById('link-email').href = `mailto:${config.email}`;
+            // WhatsApp: detectar si ya es URL completa o solo número
+            const wa = config.whatsapp || '';
+            if (wa.startsWith('http')) {
+                document.getElementById('link-wa').href = wa;
+            } else {
+                document.getElementById('link-wa').href = `https://wa.me/${wa.replace(/\D/g, '')}`;
+            }
+            
+            // Instagram: detectar si ya es URL completa o solo username
+            const ig = config.instagram || '';
+            if (ig.startsWith('http')) {
+                document.getElementById('link-ig').href = ig;
+            } else {
+                document.getElementById('link-ig').href = `https://instagram.com/${ig.replace('@', '')}`;
+            }
+            
+            // Email: detectar si ya es mailto o solo email
+            const email = config.email || '';
+            if (email.startsWith('mailto:')) {
+                document.getElementById('link-email').href = email;
+            } else {
+                document.getElementById('link-email').href = `mailto:${email}`;
+            }
         }
 
         function actualizarPresentacion() {
