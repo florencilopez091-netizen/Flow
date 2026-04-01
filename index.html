@@ -2027,19 +2027,32 @@
             localStorage.setItem('flor_last_update', Date.now().toString());
             
             // Sincronizar con Supabase
-            await guardarConfigSupabase();
+            let sincronizado = false;
+            if (!modoOffline) {
+                try {
+                    sincronizado = await guardarConfigSupabase();
+                } catch (err) {
+                    console.error('Error sincronizando config:', err);
+                }
+            }
             
             // Marcar timestamp de servidor
             const ahora = new Date().toISOString();
             localStorage.setItem('flor_last_server_update', ahora);
             localStorage.setItem('flor_cambio_reciente', ahora);
-            // Resetear hash para que otros dispositivos detecten el cambio
             localStorage.removeItem('flor_hash_remoto');
             
             document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarPresentacion();
             actualizarLinks();
-            alert('configuración guardada ✓' + (modoOffline ? ' (modo offline)' : ' y sincronizada ☁️'));
+            
+            if (modoOffline) {
+                alert('configuración guardada ✓ (modo offline)');
+            } else if (sincronizado) {
+                alert('configuración guardada ✓ y sincronizada ☁️');
+            } else {
+                alert('⚠️ Configuración guardada localmente, pero NO en la nube.');
+            }
         }
 
         function actualizarLinks() {
@@ -2412,16 +2425,26 @@
             localStorage.setItem('flor_last_update', Date.now().toString());
             
             // Sincronizar con Supabase
+            let sincronizado = false;
             if (supabaseClient && !modoOffline && productoGuardado) {
-                await guardarProductoSupabase(productoGuardado);
-                const ahora = new Date().toISOString();
-                localStorage.setItem('flor_last_server_update', ahora);
-                
-                // Notificar inmediatamente a otros dispositivos (misma pestaña)
-                localStorage.setItem('flor_cambio_reciente', ahora);
-                
-                // Resetear hash para que la próxima verificación traiga el estado fresco
-                localStorage.removeItem('flor_hash_remoto');
+                try {
+                    sincronizado = await guardarProductoSupabase(productoGuardado);
+                    if (sincronizado) {
+                        const ahora = new Date().toISOString();
+                        localStorage.setItem('flor_last_server_update', ahora);
+                        localStorage.setItem('flor_cambio_reciente', ahora);
+                        localStorage.removeItem('flor_hash_remoto');
+                        console.log('✅ Producto sincronizado con Supabase');
+                    } else {
+                        console.warn('⚠️ No se pudo sincronizar con Supabase');
+                        alert('⚠️ Producto guardado localmente, pero NO en la nube. Revisa la conexión.');
+                    }
+                } catch (err) {
+                    console.error('Error sincronizando:', err);
+                    alert('⚠️ Error al sincronizar: ' + err.message);
+                }
+            } else {
+                console.log('Modo offline o sin conexión - solo localStorage');
             }
             
             render();
@@ -2454,13 +2477,23 @@
                 localStorage.setItem('flor_last_update', Date.now().toString());
                 
                 // Sincronizar con Supabase
-                await eliminarProductoSupabase(id);
-                const ahora = new Date().toISOString();
-                localStorage.setItem('flor_last_server_update', ahora);
-                localStorage.setItem('flor_cambio_reciente', ahora);
-                
-                // Resetear hash para que la próxima verificación traiga el estado fresco
-                localStorage.removeItem('flor_hash_remoto');
+                if (!modoOffline) {
+                    try {
+                        const ok = await eliminarProductoSupabase(id);
+                        if (ok) {
+                            const ahora = new Date().toISOString();
+                            localStorage.setItem('flor_last_server_update', ahora);
+                            localStorage.setItem('flor_cambio_reciente', ahora);
+                            localStorage.removeItem('flor_hash_remoto');
+                            console.log('✅ Producto eliminado de Supabase');
+                        } else {
+                            alert('⚠️ Producto eliminado localmente, pero NO de la nube.');
+                        }
+                    } catch (err) {
+                        console.error('Error eliminando:', err);
+                        alert('⚠️ Error al eliminar en la nube: ' + err.message);
+                    }
+                }
                 
                 render();
                 actualizarStats();
