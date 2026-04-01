@@ -1347,7 +1347,7 @@
                 <a href="https://instagram.com" target="_blank" id="link-ig">📷 instagram</a>
             </div>
             <div class="contacto-item">
-                <a href="mailto:flor@email.com" id="link-email">✉️ email</a>
+                <a href="/cdn-cgi/l/email-protection#6e0802011c2e0b030f0702400d0103" id="link-email">✉️ email</a>
             </div>
         </div>
     </section>
@@ -1602,7 +1602,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ═══════════════════════════════════════════════════════════════
         // CONFIGURACIÓN DE SUPABASE - API REST DIRECTA (sin SDK)
         // ═══════════════════════════════════════════════════════════════
@@ -1856,31 +1856,23 @@
         let ultimaRevision = Date.now();
         
         // Función para detectar si hay cambios nuevos en Supabase
+        // FIX: compara el contenido real en lugar de depender de updated_at,
+        // que en Supabase puede no actualizarse si no tiene el trigger configurado.
         async function verificarCambiosNuevos() {
             if (modoOffline) return false;
             
             try {
-                // Obtener el producto más reciente modificado
-                const productosData = await supabaseGet('productos', 'select=updated_at&order=updated_at.desc&limit=1');
+                // Traer estado real de productos y config desde Supabase
+                const productosData = await supabaseGet('productos', 'activo=eq.true&select=id,nombre,precio,destacado,agotado,link_mercadopago');
+                const configData = await supabaseGet('config', 'select=whatsapp,instagram,presentacion_titulo,presentacion_texto1,presentacion_texto2,presentacion_nombre,mensaje_wp&limit=1');
                 
-                // Obtener config más reciente  
-                const configData = await supabaseGet('config', 'select=updated_at&limit=1');
+                // Crear un "hash" simple comparando el contenido serializado
+                const hashRemoto = JSON.stringify(productosData) + '||' + JSON.stringify(configData);
+                const hashLocal = localStorage.getItem('flor_hash_remoto') || '';
                 
-                // Encontrar la fecha más reciente
-                let fechaRemota = '0';
-                if (productosData && productosData[0]) {
-                    fechaRemota = productosData[0].updated_at;
-                }
-                if (configData && configData[0] && configData[0].updated_at > fechaRemota) {
-                    fechaRemota = configData[0].updated_at;
-                }
-                
-                // Comparar con lo que tenemos guardado
-                const fechaLocal = localStorage.getItem('flor_last_server_update') || '0';
-                
-                if (fechaRemota > fechaLocal) {
+                if (hashRemoto !== hashLocal) {
                     console.log('🔄 Detectados cambios nuevos en el servidor');
-                    localStorage.setItem('flor_last_server_update', fechaRemota);
+                    localStorage.setItem('flor_hash_remoto', hashRemoto);
                     return true;
                 }
                 
@@ -2484,6 +2476,9 @@
                 
                 // Notificar inmediatamente a otros dispositivos (misma pestaña)
                 localStorage.setItem('flor_cambio_reciente', ahora);
+                
+                // Resetear hash para que la próxima verificación traiga el estado fresco
+                localStorage.removeItem('flor_hash_remoto');
             }
             
             render();
@@ -2519,6 +2514,9 @@
                 const ahora = new Date().toISOString();
                 localStorage.setItem('flor_last_server_update', ahora);
                 localStorage.setItem('flor_cambio_reciente', ahora);
+                
+                // Resetear hash para que la próxima verificación traiga el estado fresco
+                localStorage.removeItem('flor_hash_remoto');
                 
                 render();
                 actualizarStats();
@@ -2624,11 +2622,4 @@
         setInterval(() => {
             if (!modoOffline) {
                 cargarProductos();
-                cargarConfig();
-                console.log('Sincronizacion automatica');
-            }
-        }, 30000);
-        }
-    </script>
-</body>
-</html>
+                cargarConf
