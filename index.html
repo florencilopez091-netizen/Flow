@@ -1814,7 +1814,9 @@
         async function guardarConfigSupabase() {
             if (!modoOffline) {
                 try {
-                    await supabasePatch('config', 1, {
+                    // Primero verificar si existe algún registro
+                    const existente = await supabaseGet('config', 'limit=1');
+                    const datos = {
                         anio_catalogo: parseInt(config.anio) || 2024,
                         presentacion_titulo: config.presentacionTitulo,
                         presentacion_texto1: config.presentacionTexto1,
@@ -1825,9 +1827,18 @@
                         email: config.email,
                         mensaje_wp: config.waMensaje,
                         updated_at: new Date().toISOString()
-                    });
+                    };
                     
-                    console.log('✅ Config guardada en Supabase');
+                    if (existente && existente.length > 0) {
+                        // Actualizar registro existente
+                        const id = existente[0].id;
+                        await supabasePatch('config', id, datos);
+                        console.log('✅ Config actualizada en Supabase (id:', id, ')');
+                    } else {
+                        // Crear nuevo registro
+                        await supabasePost('config', datos);
+                        console.log('✅ Config creada en Supabase');
+                    }
                     return true;
                 } catch (e) {
                     console.error('Error guardando config en Supabase:', e);
