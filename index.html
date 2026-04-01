@@ -1916,64 +1916,78 @@
         }
         
         // Función para actualizar automáticamente si hay cambios
+        // Contador de verificaciones sin cambios
+        let contadorSinCambios = 0;
+        
         async function autoActualizar() {
+            // Solo verificar si estamos conectados a Supabase
+            if (!supabaseClient || modoOffline) return;
+            
             const hayCambios = await verificarCambiosNuevos();
             if (hayCambios) {
-                console.log('🔄 Actualizando automáticamente...');
-                await sincronizarTodo();
+                console.log('🔄 Cambios nuevos detectados en el servidor');
+                contadorSinCambios = 0;
                 
-                // Si el usuario está en la página, mostrar notificación sutil
-                mostrarNotificacionUpdate();
+                // Verificar que no esté el modal de admin abierto
+                const modalAbierto = document.getElementById('modal')?.classList.contains('activo');
+                if (!modalAbierto) {
+                    recargarSilenciosamente();
+                } else {
+                    console.log('⏳ Modal abierto, esperando para recargar...');
+                }
+            } else {
+                contadorSinCambios++;
             }
         }
         
-        // Mostrar notificación sutil de actualización
-        function mostrarNotificacionUpdate() {
-            // Verificar si ya existe la notificación
-            if (document.getElementById('notificacion-update')) return;
+        // Recarga automática silenciosa cuando hay cambios
+        function recargarSilenciosamente() {
+            // Evitar múltiples recargas
+            if (window.recargando) return;
+            window.recargando = true;
             
-            const notif = document.createElement('div');
-            notif.id = 'notificacion-update';
-            notif.innerHTML = `
-                <div style="
-                    position: fixed;
-                    bottom: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(0, 209, 132, 0.95);
-                    color: #000;
-                    padding: 12px 24px;
-                    border-radius: 100px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    z-index: 9999;
-                    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-                    animation: fadeInUp 0.3s ease;
-                    cursor: pointer;
-                " onclick="location.reload()">
-                    🔄 Página actualizada con cambios nuevos - Tocá acá para recargar
-                </div>
-            `;
-            document.body.appendChild(notif);
+            console.log('🔄 Cambios detectados, recargando página...');
             
-            // Auto-recargar después de 5 segundos si el usuario no tocó
-            setTimeout(() => {
-                location.reload();
-            }, 5000);
+            // Guardar posición de scroll para restaurar después
+            localStorage.setItem('flor_scroll_y', window.scrollY);
+            
+            // Recargar sin caché
+            location.reload(true);
         }
         
-        // Verificar cambios cada 10 segundos (muy frecuente para estar siempre actualizado)
-        setInterval(autoActualizar, 10000);
+        // Restaurar scroll después de recargar
+        window.addEventListener('load', () => {
+            const scrollY = localStorage.getItem('flor_scroll_y');
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY));
+                localStorage.removeItem('flor_scroll_y');
+            }
+        });
+        
+        // Verificar cambios cada 5 segundos (muy frecuente para estar siempre actualizado)
+        setInterval(autoActualizar, 5000);
         
         // También verificar cuando la pestaña vuelve a estar activa
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
+                // Forzar verificación inmediata al volver a la pestaña
+                setTimeout(autoActualizar, 500);
+            }
+        });
+        
+        // Verificar cuando el usuario hace clic en la página (interacción)
+        let ultimaVerificacionClick = 0;
+        document.addEventListener('click', () => {
+            const ahora = Date.now();
+            // Verificar máximo una vez por segundo
+            if (ahora - ultimaVerificacionClick > 1000) {
+                ultimaVerificacionClick = ahora;
                 autoActualizar();
             }
         });
         
-        // Verificar al cargar la página
-        setTimeout(autoActualizar, 2000);
+        // Verificar al cargar la página (después de que todo esté listo)
+        setTimeout(autoActualizar, 3000);
         
         // Función para limpiar caché (solo para emergencias, sigue estando disponible)
         function forzarActualizacion() {
@@ -2107,7 +2121,9 @@
             await guardarConfigSupabase();
             
             // Marcar timestamp de servidor
-            localStorage.setItem('flor_last_server_update', new Date().toISOString());
+            const ahora = new Date().toISOString();
+            localStorage.setItem('flor_last_server_update', ahora);
+            localStorage.setItem('flor_cambio_reciente', ahora);
             
             document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarPresentacion();
@@ -2357,18 +2373,23 @@
             }
         }
         
-        // Mostrar advertencia si hay problemas de CSP (después de esperar la conexión)
+        // Mostrar estado de conexión después de inicializar
         setTimeout(() => {
             if (modoOffline && window.location.protocol !== 'file:') {
                 console.warn('⚠️ Página funcionando en modo offline. Los datos solo se guardan en este dispositivo.');
+            } else if (!modoOffline && supabaseClient) {
+                console.log('✅ Modo online activo. Los cambios se sincronizan automáticamente entre dispositivos.');
             }
         }, 2000);
         
-        // Escuchar cambios desde otros dispositivos (sincronización en tiempo real)
+        // Escuchar cambios desde otros dispositivos/pestañas (sincronización inmediata)
         window.addEventListener('storage', (e) => {
-            if (e.key === 'flor_sync_notif') {
-                console.log('🔄 Cambio detectado desde otro dispositivo');
-                autoActualizar();
+            if (e.key === 'flor_sync_notif' || e.key === 'flor_cambio_reciente') {
+                console.log('🔄 Cambio detectado desde otro dispositivo/pestaña');
+                // Forzar recarga inmediata para ver cambios
+                setTimeout(() => {
+                    location.reload(true);
+                }, 500);
             }
         });
         
@@ -2482,14 +2503,20 @@
             // Sincronizar con Supabase
             if (supabaseClient && !modoOffline && productoGuardado) {
                 await guardarProductoSupabase(productoGuardado);
-                localStorage.setItem('flor_last_server_update', new Date().toISOString());
+                const ahora = new Date().toISOString();
+                localStorage.setItem('flor_last_server_update', ahora);
+                
+                // Notificar inmediatamente a otros dispositivos (misma pestaña)
+                localStorage.setItem('flor_cambio_reciente', ahora);
             }
             
             render();
             actualizarStats();
             renderAdmin();
             cancelar();
-        }
+            
+            // Mensaje de éxito
+            console.log('✅ Producto guardado y sincronizado');
 
         function editar(id) {
             const p = productos.find(x => x.id === id);
@@ -2513,7 +2540,9 @@
                 
                 // Sincronizar con Supabase
                 await eliminarProductoSupabase(id);
-                localStorage.setItem('flor_last_server_update', new Date().toISOString());
+                const ahora = new Date().toISOString();
+                localStorage.setItem('flor_last_server_update', ahora);
+                localStorage.setItem('flor_cambio_reciente', ahora);
                 
                 render();
                 actualizarStats();
