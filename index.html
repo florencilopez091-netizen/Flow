@@ -26,30 +26,68 @@
             --gris: #888;
         }
 
-        body {
-            font-family: 'Space Grotesk', sans-serif;
+        html {
             background: var(--negro);
-            color: var(--blanco);
-            line-height: 1.5;
-            overflow-x: hidden;
+            min-height: 100%;
+            overscroll-behavior: none;
+            scroll-behavior: smooth;
         }
 
-        /* FONDO CON TUS FLORES DE HIBISCO - AHORA SE VE MEJOR */
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: transparent;
+            color: var(--blanco);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* MEJORA DE CONTRASTE EN TEXTOS */
+        p, span, a, label, input, textarea, select, button {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .producto-nombre, .titulo-seccion, h1, h2, h3, h4 {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* FONDO SUTIL DETRÁS DE TEXTOS IMPORTANTES */
+        .sobre-mi-texto {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        .producto-info {
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+            padding: 25px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        /* FONDO CON FLORES DE HIBISCO - IMAGEN SUAVE CON PARALAJE */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
             background-image: url('flores-fondo.png');
-            background-size: 250px auto;
+            background-size: 350px auto;
             background-repeat: repeat;
             background-position: center;
-            opacity: 0.4;
+            opacity: 0.12;
             pointer-events: none;
             z-index: -1;
-            filter: contrast(1.2) brightness(0.8);
+            filter: contrast(1.1) brightness(0.9);
+            animation: float-bg 20s ease-in-out infinite;
+        }
+
+        @keyframes float-bg {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-1%, -1%) scale(1.02); }
         }
 
         body::after {
@@ -66,7 +104,24 @@
             z-index: -1;
         }
 
-        /* PARTÍCULAS FLOTANTES */
+        /* BRILLO DEL CURSOR */
+        .cursor-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        body:hover .cursor-glow {
+            opacity: 1;
+        }
+
+        /* PARTÍCULAS FLOTANTES MEJORADAS */
         .particles {
             position: fixed;
             top: 0;
@@ -87,14 +142,16 @@
             animation: float-particle 15s infinite ease-in-out;
         }
 
-        .particle:nth-child(1) { left: 10%; top: 90%; animation-delay: 0s; }
-        .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 2s; width: 6px; height: 6px; }
-        .particle:nth-child(3) { left: 30%; top: 95%; animation-delay: 4s; }
-        .particle:nth-child(4) { left: 50%; top: 85%; animation-delay: 1s; width: 3px; height: 3px; }
-        .particle:nth-child(5) { left: 70%; top: 90%; animation-delay: 3s; }
-        .particle:nth-child(6) { left: 80%; top: 75%; animation-delay: 5s; width: 5px; height: 5px; }
-        .particle:nth-child(7) { left: 90%; top: 95%; animation-delay: 2.5s; }
-        .particle:nth-child(8) { left: 5%; top: 70%; animation-delay: 1.5s; width: 4px; height: 4px; }
+        .particle:nth-child(1) { left: 10%; top: 95%; animation-delay: 0s; opacity: 0.4; }
+        .particle:nth-child(2) { left: 20%; top: 85%; animation-delay: 3s; width: 4px; height: 4px; opacity: 0.3; }
+        .particle:nth-child(3) { left: 35%; top: 98%; animation-delay: 6s; opacity: 0.5; }
+        .particle:nth-child(4) { left: 50%; top: 90%; animation-delay: 2s; width: 2px; height: 2px; opacity: 0.4; }
+        .particle:nth-child(5) { left: 65%; top: 95%; animation-delay: 5s; opacity: 0.3; }
+        .particle:nth-child(6) { left: 80%; top: 88%; animation-delay: 1s; width: 3px; height: 3px; opacity: 0.5; }
+        .particle:nth-child(7) { left: 90%; top: 92%; animation-delay: 4s; opacity: 0.4; }
+        .particle:nth-child(8) { left: 5%; top: 80%; animation-delay: 7s; width: 2px; height: 2px; opacity: 0.3; }
+        .particle:nth-child(9) { left: 45%; top: 85%; animation-delay: 2.5s; opacity: 0.35; }
+        .particle:nth-child(10) { left: 75%; top: 82%; animation-delay: 5.5s; width: 3px; height: 3px; opacity: 0.4; }
 
         @keyframes float-particle {
             0%, 100% {
@@ -139,11 +196,11 @@
             transform: rotate(45deg) translateX(100%);
         }
 
-        /* ANIMACIÓN DE ENTRADA PARA ELEMENTOS */
+        /* ANIMACIONES DE ENTRADA SUAVES */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(40px);
             }
             to {
                 opacity: 1;
@@ -151,22 +208,92 @@
             }
         }
 
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(255, 20, 147, 0.5), 0 0 60px rgba(255, 0, 255, 0.2);
+            }
+        }
+
+        /* SCROLL REVEAL - Elementos aparecen al scrollear */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-scale.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Productos con animación escalonada */
         .producto-card {
-            animation: fadeInUp 0.6s ease-out backwards;
+            opacity: 0;
+            animation: fadeInUp 0.7s ease-out forwards;
         }
 
         .producto-card:nth-child(1) { animation-delay: 0.1s; }
-        .producto-card:nth-child(2) { animation-delay: 0.2s; }
-        .producto-card:nth-child(3) { animation-delay: 0.3s; }
-        .producto-card:nth-child(4) { animation-delay: 0.4s; }
-        .producto-card:nth-child(5) { animation-delay: 0.5s; }
-        .producto-card:nth-child(6) { animation-delay: 0.6s; }
+        .producto-card:nth-child(2) { animation-delay: 0.18s; }
+        .producto-card:nth-child(3) { animation-delay: 0.26s; }
+        .producto-card:nth-child(4) { animation-delay: 0.34s; }
+        .producto-card:nth-child(5) { animation-delay: 0.42s; }
+        .producto-card:nth-child(6) { animation-delay: 0.5s; }
+
+        /* Hover suave en imágenes de productos */
+        .producto-img {
+            transition: transform 0.5s ease;
+        }
+
+        .producto-card:hover .producto-img {
+            transform: scale(1.05);
+        }
 
         /* HEADER */
         header {
             padding: 30px 20px 40px;
             text-align: center;
             position: relative;
+            animation: fadeInScale 1s ease-out;
+        }
+
+        /* Brillo sutil en el header */
+        header::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(255, 20, 147, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: glow-pulse 4s ease-in-out infinite;
         }
 
         .logo-container {
@@ -187,8 +314,8 @@
                 0 0 40px rgba(255, 20, 147, 0.5),
                 0 0 80px rgba(255, 0, 255, 0.3),
                 inset 0 0 30px rgba(255, 20, 147, 0.2);
-            animation: neon-pulse 1.5s ease-in-out infinite, float-logo 3s ease-in-out infinite;
-            transition: all 0.3s;
+            animation: neon-pulse 3s ease-in-out infinite, float-logo 4s ease-in-out infinite;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo-container:hover .logo-img {
@@ -371,8 +498,8 @@
         }
 
         .filtro-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 20, 147, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 20, 147, 0.2);
             color: var(--gris);
             padding: 12px 28px;
             border-radius: 100px;
@@ -381,16 +508,36 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filtro-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            border-radius: 50%;
+        }
+
+        .filtro-btn:hover::before {
+            width: 150px;
+            height: 150px;
         }
 
         .filtro-btn:hover {
-            background: rgba(255, 20, 147, 0.2);
+            background: rgba(255, 20, 147, 0.15);
             border-color: var(--rosa-flow);
             color: var(--blanco);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.25);
         }
 
         .filtro-btn.activo {
@@ -608,6 +755,12 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 40px rgba(255, 20, 147, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sobre-mi:hover {
+            border-color: rgba(255, 20, 147, 0.35);
+            box-shadow: 0 0 60px rgba(255, 20, 147, 0.15), inset 0 0 30px rgba(255, 20, 147, 0.03);
         }
 
         .sobre-mi::before {
@@ -669,11 +822,12 @@
         }
 
         .sobre-mi-texto p {
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 1rem;
-            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.98);
+            font-size: 1.05rem;
+            line-height: 2;
             margin-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+            font-weight: 400;
         }
 
         .firma {
@@ -692,6 +846,11 @@
             position: relative;
             border-top: 1px solid rgba(255, 20, 147, 0.2);
             border-bottom: 1px solid rgba(255, 20, 147, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .contacto-section:hover {
+            background: rgba(255, 20, 147, 0.02);
         }
 
         .contacto-section::before {
@@ -743,16 +902,33 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contacto-item a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .contacto-item a:hover::before {
+            left: 100%;
         }
 
         .contacto-item a:hover {
             background: var(--rosa-flow);
             color: var(--negro);
             border-color: var(--rosa-flow);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.4);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.35);
         }
 
         /* FOOTER */
@@ -769,45 +945,42 @@
             text-shadow: 0 0 10px var(--rosa-flow);
         }
 
-        /* ADMIN - CANDADO ESTILIZADO */
+        /* ADMIN - CANDADO BLANCO EFECTO VIDRIO */
         .admin-btn {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
-            width: 32px;
-            height: 32px;
-            background: transparent;
-            border: 1px solid rgba(255, 20, 147, 0.3);
-            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            z-index: 50;
-            opacity: 0.6;
+            z-index: 1000;
         }
 
         .admin-btn::before {
-            content: '';
-            width: 14px;
-            height: 16px;
-            background: linear-gradient(135deg, rgba(255, 20, 147, 0.6) 0%, rgba(255, 0, 255, 0.4) 100%);
-            clip-path: path('M4 7V5a3 3 0 0 1 6 0v2h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1zm5-2v2H7V5a1 1 0 0 1 2 0z');
+            content: '🔒';
+            font-size: 18px;
+            filter: grayscale(1) brightness(2);
+            opacity: 0.7;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 0 3px rgba(255, 20, 147, 0.5));
         }
 
         .admin-btn:hover {
-            border-color: var(--rosa-flow);
-            opacity: 1;
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(255, 20, 147, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
         .admin-btn:hover::before {
-            background: linear-gradient(135deg, var(--rosa-flow) 0%, var(--rosa-neon) 100%);
-            filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.8));
+            opacity: 1;
+            filter: grayscale(0) brightness(1.2) drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
         }
 
         .modal {
@@ -1252,8 +1425,15 @@
     </style>
 </head>
 <body>
-    <!-- Partículas flotantes de fondo -->
+    <!-- Partículas flotantes de fondo mejoradas -->
     <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
@@ -1352,9 +1532,12 @@
                 <h3>⚡ panel de control</h3>
                 
                 <div class="admin-tabs">
-                    <button class="admin-tab activo" onclick="cambiarTab('productos', this)">productos</button>
-                    <button class="admin-tab" onclick="cambiarTab('config', this)">config</button>
-                    <button class="admin-tab" onclick="cambiarTab('datos', this)">datos</button>
+                    <button class="admin-tab activo" onclick="cambiarTab('productos', this)">📦 productos</button>
+                    <button class="admin-tab" onclick="cambiarTab('config', this)">⚙️ config</button>
+                    <button class="admin-tab" onclick="cambiarTab('personalizacion', this)">🎨 diseño</button>
+                    <button class="admin-tab" onclick="cambiarTab('estadisticas', this)">📊 stats</button>
+                    <button class="admin-tab" onclick="cambiarTab('herramientas', this)">🛠️ tools</button>
+                    <button class="admin-tab" onclick="cambiarTab('datos', this)">💾 datos</button>
                 </div>
 
                 <div class="admin-content activo" id="tab-productos">
@@ -1414,54 +1597,251 @@
                 <div class="admin-content" id="tab-config">
                     <h4 style="margin-bottom: 20px; color: var(--gris);">📅 información general</h4>
                     <div class="form-group">
+                        <label>título de la página</label>
+                        <input type="text" id="config-titulo-pagina" placeholder="Collares con Flow">
+                    </div>
+                    <div class="form-group">
+                        <label>subtítulo / tagline</label>
+                        <input type="text" id="config-tagline" placeholder="by florencia lopez">
+                    </div>
+                    <div class="form-group">
                         <label>año del catálogo</label>
                         <input type="number" id="config-anio" value="2024">
                     </div>
                     
-                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">💬 sección "sobre mí"</h4>
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">💬 sección "sobre mí" - COMPLETO</h4>
+                    
+                    <!-- VISTA PREVIA EN TIEMPO REAL -->
+                    <div style="background: rgba(255,20,147,0.1); border: 1px solid rgba(255,20,147,0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                        <label style="color: var(--rosa-flow); margin-bottom: 10px;">👁️ vista previa:</label>
+                        <div id="preview-presentacion" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; font-size: 0.9rem;">
+                            <h5 style="color: var(--rosa-flow); margin-bottom: 8px;" id="preview-titulo">hola, soy flor ✌️</h5>
+                            <p style="color: #ccc; margin-bottom: 5px;" id="preview-texto1">...</p>
+                            <p style="color: #ccc; margin-bottom: 5px;" id="preview-texto2">...</p>
+                            <p style="color: var(--rosa-flow);" id="preview-firma">— florencia</p>
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <label>título</label>
-                        <input type="text" id="config-presentacion-titulo" placeholder="hola, soy flor ✌️">
+                        <label>título de presentación</label>
+                        <input type="text" id="config-presentacion-titulo" placeholder="hola, soy flor ✌️" oninput="actualizarPreviewPresentacion()">
                     </div>
                     <div class="form-group">
                         <label>primer párrafo</label>
-                        <textarea id="config-presentacion-texto1" rows="3" placeholder="diseño y hago joyas..."></textarea>
+                        <textarea id="config-presentacion-texto1" rows="3" placeholder="diseño y hago joyas..." oninput="actualizarPreviewPresentacion()"></textarea>
                     </div>
                     <div class="form-group">
                         <label>segundo párrafo</label>
-                        <textarea id="config-presentacion-texto2" rows="3" placeholder="uso materiales de buena calidad..."></textarea>
+                        <textarea id="config-presentacion-texto2" rows="3" placeholder="uso materiales de buena calidad..." oninput="actualizarPreviewPresentacion()"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>tercer párrafo (opcional)</label>
+                        <textarea id="config-presentacion-texto3" rows="2" placeholder="agregá más info si querés..." oninput="actualizarPreviewPresentacion()"></textarea>
                     </div>
                     <div class="form-group">
                         <label>firma (nombre)</label>
-                        <input type="text" id="config-presentacion-nombre" placeholder="florencia">
+                        <input type="text" id="config-presentacion-nombre" placeholder="florencia" oninput="actualizarPreviewPresentacion()">
+                    </div>
+                    <div class="form-group">
+                        <label>emoji/especial al final</label>
+                        <input type="text" id="config-presentacion-emoji" placeholder="💫 ✨ 🌸" oninput="actualizarPreviewPresentacion()">
                     </div>
                     
                     <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📱 contacto</h4>
                     <div class="form-group">
-                        <label>whatsapp</label>
+                        <label>whatsapp (solo números)</label>
                         <input type="text" id="config-wa" placeholder="5490000000000">
                     </div>
                     <div class="form-group">
-                        <label>instagram</label>
+                        <label>instagram (con @)</label>
                         <input type="text" id="config-ig" placeholder="@usuario">
                     </div>
                     <div class="form-group">
                         <label>email</label>
                         <input type="email" id="config-email" placeholder="email@ejemplo.com">
                     </div>
-                    <button class="btn-primario" onclick="guardarConfig()">guardar cambios</button>
+                    <div class="form-group">
+                        <label>mensaje personalizado de whatsapp</label>
+                        <input type="text" id="config-wa-mensaje" placeholder="hola! me interesa el">
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🎨 footer</h4>
+                    <div class="form-group">
+                        <label>texto del footer</label>
+                        <input type="text" id="config-footer" placeholder="hecho con ♥ by florencia lopez">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn-primario" onclick="guardarConfig()" style="flex: 1;">💾 guardar todo</button>
+                        <button class="btn-sec" onclick="resetearConfig()" style="flex: 1;">🔄 resetear</button>
+                    </div>
+                </div>
+
+                <!-- NUEVA PESTAÑA: PERSONALIZACIÓN -->
+                <div class="admin-content" id="tab-personalizacion">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">🎨 colores del tema</h4>
+                    <div class="form-group">
+                        <label>color principal (rosa fucsia)</label>
+                        <input type="color" id="color-principal" value="#ff1493" style="height: 50px; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>color secundario (rosa neon)</label>
+                        <input type="color" id="color-secundario" value="#ff00ff" style="height: 50px; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>intensidad del brillo</label>
+                        <input type="range" id="intensidad-brillo" min="0" max="100" value="50" style="width: 100%;">
+                        <small style="color: var(--gris);">ajustá qué tan intenso es el efecto neon</small>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">✨ efectos visuales</h4>
+                    <div class="checkbox-group" style="margin-bottom: 20px;">
+                        <label class="checkbox-item" style="color: var(--blanco);">
+                            <input type="checkbox" id="efecto-particulas" checked>
+                            <span>partículas flotantes</span>
+                        </label>
+                        <label class="checkbox-item" style="color: var(--blanco);">
+                            <input type="checkbox" id="efecto-cursor" checked>
+                            <span>brillo del cursor</span>
+                        </label>
+                        <label class="checkbox-item" style="color: var(--blanco);">
+                            <input type="checkbox" id="efecto-animaciones" checked>
+                            <span>animaciones de entrada</span>
+                        </label>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🖼️ logo e imágenes</h4>
+                    <div class="form-group">
+                        <label>URL del logo (dejar vacío para usar logo-flow.png)</label>
+                        <input type="text" id="config-logo" placeholder="https://... o dejar vacío">
+                    </div>
+                    <div class="form-group">
+                        <label>mostrar anillos animados alrededor del logo</label>
+                        <select id="config-anillos-logo">
+                            <option value="si">sí</option>
+                            <option value="no">no</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-primario" onclick="guardarPersonalizacion()">aplicar cambios</button>
+                </div>
+
+                <!-- NUEVA PESTAÑA: ESTADÍSTICAS -->
+                <div class="admin-content" id="tab-estadisticas">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">📊 resumen de la tienda</h4>
+                    
+                    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 25px;">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-total">0</div>
+                            <div class="stat-label">productos totales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-destacados">0</div>
+                            <div class="stat-label">destacados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-agotados" style="color: #ff6b6b;">0</div>
+                            <div class="stat-label">agotados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-valor" style="color: #00d084;">$0</div>
+                            <div class="stat-label">valor total</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📈 por categoría</h4>
+                    <div id="stats-categorias" style="margin-bottom: 20px;">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">💰 precios</h4>
+                    <div class="stats-grid" style="grid-template-columns: 1fr;">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-precio-promedio" style="font-size: 1.5rem;">$0</div>
+                            <div class="stat-label">precio promedio</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-precio-min" style="font-size: 1.2rem; color: var(--gris);">$0</div>
+                            <div class="stat-label">más barato</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-precio-max" style="font-size: 1.2rem; color: var(--rosa-flow);">$0</div>
+                            <div class="stat-label">más caro</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-sec" onclick="actualizarStats()" style="width: 100%; margin-top: 15px;">🔄 actualizar estadísticas</button>
+                </div>
+
+                <!-- NUEVA PESTAÑA: HERRAMIENTAS -->
+                <div class="admin-content" id="tab-herramientas">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">🔧 utilidades rápidas</h4>
+                    
+                    <div class="form-group">
+                        <label>🔍 buscar producto</label>
+                        <input type="text" id="buscar-producto" placeholder="escribí el nombre..." oninput="buscarProductoAdmin(this.value)">
+                        <div id="resultados-busqueda" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">⚡ acciones rápidas</h4>
+                    
+                    <button class="btn-sec" onclick="duplicarUltimoProducto()" style="width: 100%; margin-bottom: 10px;">
+                        📋 duplicar último producto
+                    </button>
+                    
+                    <button class="btn-sec" onclick="marcarTodosDestacados(false)" style="width: 100%; margin-bottom: 10px;">
+                        ❌ quitar todos los destacados
+                    </button>
+                    
+                    <button class="btn-sec" onclick="ordenarPorPrecio('asc')" style="width: 100%; margin-bottom: 10px;">
+                        🔽 ordenar por precio (menor a mayor)
+                    </button>
+                    
+                    <button class="btn-sec" onclick="ordenarPorPrecio('desc')" style="width: 100%; margin-bottom: 10px;">
+                        🔼 ordenar por precio (mayor a menor)
+                    </button>
+                    
+                    <button class="btn-sec" onclick="ordenarAlfabeticamente()" style="width: 100%; margin-bottom: 10px;">
+                        🔤 ordenar alfabéticamente
+                    </button>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🚨 modo mantenimiento</h4>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item" style="color: var(--blanco);">
+                            <input type="checkbox" id="modo-mantenimiento">
+                            <span>activar modo mantenimiento (oculta productos)</span>
+                        </label>
+                    </div>
+                    <button class="btn-primario" onclick="toggleModoMantenimiento()" style="margin-top: 15px;">
+                        aplicar modo mantenimiento
+                    </button>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">⚠️ zona peligrosa</h4>
+                    <button class="btn-sec" onclick="eliminarTodosLosProductos()" style="width: 100%; background: rgba(255, 0, 0, 0.1); border-color: #ff4444; color: #ff4444;">
+                        🗑️ eliminar TODOS los productos
+                    </button>
                 </div>
 
                 <div class="admin-content" id="tab-datos">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">💾 backup y restauración</h4>
+                    
                     <div class="export-section">
-                        <p>📥 exportar todos los datos</p>
+                        <p>📥 exportar todos los datos (productos + configuración)</p>
                         <button class="btn-sec" onclick="exportarDatos()">descargar JSON</button>
                     </div>
                     <div class="export-section">
-                        <p>📤 importar datos</p>
+                        <p>📤 importar datos desde archivo</p>
                         <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importarDatos(this)">
                         <button class="btn-sec" onclick="document.getElementById('import-file').click()">seleccionar archivo</button>
                     </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📋 copiar al portapapeles</h4>
+                    <button class="btn-sec" onclick="copiarListaProductos()" style="width: 100%; margin-bottom: 10px;">
+                        📄 copiar lista de productos
+                    </button>
+                    <button class="btn-sec" onclick="copiarConfiguracion()" style="width: 100%;">
+                        ⚙️ copiar configuración
+                    </button>
                 </div>
 
                 <button class="btn-sec" onclick="logout()" style="margin-top: 20px; width: 100%;">🔒 cerrar sesión</button>
@@ -1491,25 +1871,257 @@
 
         let filtroActivo = 'todos';
 
-        function guardar() {
+        function guardarDatos() {
             localStorage.setItem('flor_productos', JSON.stringify(productos));
         }
+        
+        // Alias para compatibilidad
+        const guardar = guardarDatos;
 
         function guardarConfig() {
+            config.tituloPagina = document.getElementById('config-titulo-pagina').value || 'Collares con Flow';
+            config.tagline = document.getElementById('config-tagline').value || 'by florencia lopez';
             config.anio = document.getElementById('config-anio').value || '2024';
             config.presentacionTitulo = document.getElementById('config-presentacion-titulo').value || 'hola, soy flor ✌️';
             config.presentacionTexto1 = document.getElementById('config-presentacion-texto1').value || 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.';
             config.presentacionTexto2 = document.getElementById('config-presentacion-texto2').value || 'uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫';
+            config.presentacionTexto3 = document.getElementById('config-presentacion-texto3').value || '';
             config.presentacionNombre = document.getElementById('config-presentacion-nombre').value || 'florencia';
-            config.whatsapp = document.getElementById('config-wa').value || config.whatsapp;
-            config.instagram = document.getElementById('config-ig').value || config.instagram;
-            config.email = document.getElementById('config-email').value || config.email;
+            config.presentacionEmoji = document.getElementById('config-presentacion-emoji').value || '💫';
+            config.whatsapp = document.getElementById('config-wa').value || '5490000000000';
+            config.instagram = document.getElementById('config-ig').value || '@florencialopez';
+            config.email = document.getElementById('config-email').value || 'flor@email.com';
+            config.waMensaje = document.getElementById('config-wa-mensaje').value || 'hola! me interesa el';
+            config.footer = document.getElementById('config-footer').value || 'hecho con ♥ by florencia lopez';
+            config.logo = document.getElementById('config-logo').value || '';
+            
             localStorage.setItem('flor_config', JSON.stringify(config));
+            
+            // Actualizar título de la página
+            document.title = config.tituloPagina + ' — by Florencia';
+            
+            // Actualizar elementos visibles
+            document.querySelector('h1').textContent = config.tituloPagina.toLowerCase();
+            document.querySelector('.tagline').innerHTML = 'by <span>' + config.tagline + '</span>';
             document.getElementById('anio-catalogo').textContent = config.anio;
+            document.querySelector('footer p').innerHTML = config.footer.replace('♥', '<span>♥</span>');
+            
+            // Actualizar logo si se especificó una URL
+            if (config.logo) {
+                document.querySelector('.logo-img').src = config.logo;
+            }
+            
             actualizarPresentacion();
             actualizarLinks();
             alert('configuración guardada ✓');
         }
+
+        function resetearConfig() {
+            if (confirm('¿estás segura? se perderán todos los cambios personalizados')) {
+                config = {
+                    anio: '2024',
+                    presentacionTitulo: 'hola, soy flor ✌️',
+                    presentacionTexto1: 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.',
+                    presentacionTexto2: 'uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫',
+                    presentacionTexto3: '',
+                    presentacionNombre: 'florencia',
+                    presentacionEmoji: '💫',
+                    whatsapp: '5490000000000',
+                    instagram: '@florencialopez',
+                    email: 'flor@email.com',
+                    waMensaje: 'hola! me interesa el',
+                    footer: 'hecho con ♥ by florencia lopez',
+                    tituloPagina: 'Collares con Flow',
+                    tagline: 'florencia lopez',
+                    logo: ''
+                };
+                localStorage.setItem('flor_config', JSON.stringify(config));
+                location.reload();
+            }
+        }
+
+        function actualizarPreviewPresentacion() {
+            const titulo = document.getElementById('config-presentacion-titulo').value || 'hola, soy flor ✌️';
+            const texto1 = document.getElementById('config-presentacion-texto1').value || '...';
+            const texto2 = document.getElementById('config-presentacion-texto2').value || '...';
+            const nombre = document.getElementById('config-presentacion-nombre').value || 'florencia';
+            
+            document.getElementById('preview-titulo').textContent = titulo;
+            document.getElementById('preview-texto1').textContent = texto1;
+            document.getElementById('preview-texto2').textContent = texto2;
+            document.getElementById('preview-firma').textContent = '— ' + nombre;
+        }
+
+        function guardarPersonalizacion() {
+            const colorPrincipal = document.getElementById('color-principal').value;
+            const colorSecundario = document.getElementById('color-secundario').value;
+            const intensidad = document.getElementById('intensidad-brillo').value;
+            const anillosLogo = document.getElementById('config-anillos-logo').value;
+            
+            config.colorPrincipal = colorPrincipal;
+            config.colorSecundario = colorSecundario;
+            config.intensidadBrillo = intensidad;
+            config.anillosLogo = anillosLogo;
+            config.efectoParticulas = document.getElementById('efecto-particulas').checked;
+            config.efectoCursor = document.getElementById('efecto-cursor').checked;
+            config.efectoAnimaciones = document.getElementById('efecto-animaciones').checked;
+            
+            localStorage.setItem('flor_config', JSON.stringify(config));
+            alert('personalización guardada ✓ recargá la página para ver los cambios');
+        }
+
+        function buscarProductoAdmin(query) {
+            const resultadosDiv = document.getElementById('resultados-busqueda');
+            if (!query.trim()) {
+                resultadosDiv.innerHTML = '';
+                return;
+            }
+            
+            const resultados = productos.filter(p => 
+                p.nombre.toLowerCase().includes(query.toLowerCase()) ||
+                p.categoria.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (resultados.length === 0) {
+                resultadosDiv.innerHTML = '<p style="color: var(--gris); font-size: 0.85rem;">no se encontraron productos</p>';
+                return;
+            }
+            
+            resultadosDiv.innerHTML = resultados.map(p => `
+                <div class="admin-item" style="padding: 10px; margin-bottom: 5px;">
+                    <div>
+                        <strong style="font-size: 0.9rem;">${p.nombre}</strong>
+                        <small style="display: block; color: #888;">$${p.precio} · ${p.categoria}</small>
+                    </div>
+                    <button class="btn-edit" onclick="editar(${p.id}); cambiarTab('productos', document.querySelectorAll('.admin-tab')[0])" style="font-size: 0.75rem; padding: 4px 10px;">editar</button>
+                </div>
+            `).join('');
+        }
+
+        function duplicarUltimoProducto() {
+            if (productos.length === 0) {
+                alert('no hay productos para duplicar');
+                return;
+            }
+            const ultimo = productos[productos.length - 1];
+            const nuevoId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+            const duplicado = { ...ultimo, id: nuevoId, nombre: ultimo.nombre + ' (copia)', destacado: false };
+            productos.push(duplicado);
+            guardarDatos();
+            render();
+            actualizarStats();
+            renderAdmin();
+            alert('producto duplicado ✓');
+        }
+
+        function marcarTodosDestacados(destacar) {
+            productos.forEach(p => p.destacado = destacar);
+            guardarDatos();
+            render();
+            actualizarStats();
+            alert(`todos los productos ${destacar ? 'marcados como destacados' : 'quitados de destacados'} ✓`);
+        }
+
+        function ordenarPorPrecio(orden) {
+            productos.sort((a, b) => orden === 'asc' ? a.precio - b.precio : b.precio - a.precio);
+            guardarDatos();
+            render();
+            renderAdmin();
+            alert('productos ordenados por precio ✓');
+        }
+
+        function ordenarAlfabeticamente() {
+            productos.sort((a, b) => a.nombre.localeCompare(b.nombre));
+            guardarDatos();
+            render();
+            renderAdmin();
+            alert('productos ordenados alfabéticamente ✓');
+        }
+
+        function toggleModoMantenimiento() {
+            const activar = document.getElementById('modo-mantenimiento').checked;
+            config.modoMantenimiento = activar;
+            localStorage.setItem('flor_config', JSON.stringify(config));
+            
+            if (activar) {
+                document.getElementById('grid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <p style="font-size: 3rem; margin-bottom: 20px;">🔧</p>
+                        <h3 style="color: var(--rosa-flow); margin-bottom: 15px;">modo mantenimiento activado</h3>
+                        <p style="color: var(--gris);">estamos actualizando el catálogo, volvé pronto ✨</p>
+                    </div>
+                `;
+            } else {
+                render();
+            }
+            alert(`modo mantenimiento ${activar ? 'activado' : 'desactivado'} ✓`);
+        }
+
+        function eliminarTodosLosProductos() {
+            if (confirm('⚠️ ¿ESTÁS SEGURA? Se eliminarán TODOS los productos permanentemente')) {
+                if (confirm('¿Realmente querés borrar todo? Esta acción no se puede deshacer')) {
+                    productos = [];
+                    guardarDatos();
+                    render();
+                    actualizarStats();
+                    renderAdmin();
+                    alert('todos los productos han sido eliminados');
+                }
+            }
+        }
+
+        function copiarListaProductos() {
+            const texto = productos.map(p => 
+                `• ${p.nombre} - $${p.precio} (${p.categoria})${p.agotado ? ' [AGOTADO]' : ''}${p.destacado ? ' [DESTACADO]' : ''}`
+            ).join('\n');
+            navigator.clipboard.writeText(texto).then(() => alert('lista copiada al portapapeles ✓'));
+        }
+
+        function copiarConfiguracion() {
+            navigator.clipboard.writeText(JSON.stringify(config, null, 2)).then(() => alert('configuración copiada ✓'));
+        }
+
+        function actualizarStatsExtendido() {
+            // Stats básicos
+            document.getElementById('stat-total').textContent = productos.length;
+            document.getElementById('stat-destacados').textContent = productos.filter(p => p.destacado).length;
+            document.getElementById('stat-agotados').textContent = productos.filter(p => p.agotado).length;
+            
+            // Valor total del inventario
+            const valorTotal = productos.reduce((sum, p) => sum + (p.agotado ? 0 : p.precio), 0);
+            document.getElementById('stat-valor').textContent = '$' + valorTotal.toLocaleString();
+            
+            // Precios
+            if (productos.length > 0) {
+                const precios = productos.map(p => p.precio);
+                const promedio = precios.reduce((a, b) => a + b, 0) / precios.length;
+                document.getElementById('stat-precio-promedio').textContent = '$' + Math.round(promedio).toLocaleString();
+                document.getElementById('stat-precio-min').textContent = '$' + Math.min(...precios).toLocaleString();
+                document.getElementById('stat-precio-max').textContent = '$' + Math.max(...precios).toLocaleString();
+            }
+            
+            // Stats por categoría
+            const categorias = {};
+            productos.forEach(p => {
+                categorias[p.categoria] = (categorias[p.categoria] || 0) + 1;
+            });
+            
+            const catsDiv = document.getElementById('stats-categorias');
+            if (Object.keys(categorias).length === 0) {
+                catsDiv.innerHTML = '<p style="color: var(--gris); font-size: 0.85rem;">no hay productos</p>';
+            } else {
+                catsDiv.innerHTML = Object.entries(categorias).map(([cat, count]) => `
+                    <div class="admin-item" style="padding: 10px 15px; margin-bottom: 8px;">
+                        <span style="text-transform: capitalize;">${cat}</span>
+                        <span style="color: var(--rosa-flow); font-weight: bold;">${count}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Reemplazar actualizarStats por la versión extendida
+        const actualizarStatsOriginal = actualizarStats;
+        actualizarStats = actualizarStatsExtendido;
 
         function actualizarLinks() {
             document.getElementById('link-wa').href = `https://wa.me/${config.whatsapp}`;
@@ -1521,7 +2133,23 @@
             document.getElementById('presentacion-titulo').textContent = config.presentacionTitulo || 'hola, soy flor ✌️';
             document.getElementById('presentacion-texto1').textContent = config.presentacionTexto1 || 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.';
             document.getElementById('presentacion-texto2').textContent = config.presentacionTexto2 || 'uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫';
-            document.getElementById('presentacion-nombre').textContent = config.presentacionNombre || 'florencia';
+            
+            // Tercer párrafo opcional
+            const texto3 = document.getElementById('presentacion-texto3');
+            if (config.presentacionTexto3 && config.presentacionTexto3.trim()) {
+                if (!texto3) {
+                    const nuevoP = document.createElement('p');
+                    nuevoP.id = 'presentacion-texto3';
+                    document.querySelector('.sobre-mi-texto').insertBefore(nuevoP, document.querySelector('.firma'));
+                }
+                document.getElementById('presentacion-texto3').textContent = config.presentacionTexto3;
+            } else if (texto3) {
+                texto3.remove();
+            }
+            
+            // Actualizar firma con emoji
+            const emoji = config.presentacionEmoji || '💫';
+            document.getElementById('presentacion-nombre').textContent = (config.presentacionNombre || 'florencia') + ' ' + emoji;
         }
 
         function render() {
@@ -1573,7 +2201,8 @@
         }
 
         function consultar(nombre) {
-            const msg = `hola! me interesa el ${nombre}`;
+            const mensajeBase = config.waMensaje || 'hola! me interesa el';
+            const msg = `${mensajeBase} ${nombre}`;
             window.open(`https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -1599,14 +2228,35 @@
                 document.getElementById('pass').value = '';
                 document.getElementById('login-error').style.display = 'none';
                 
+                // Cargar todos los valores de configuración
+                document.getElementById('config-titulo-pagina').value = config.tituloPagina || '';
+                document.getElementById('config-tagline').value = config.tagline || '';
                 document.getElementById('config-anio').value = config.anio;
                 document.getElementById('config-presentacion-titulo').value = config.presentacionTitulo || '';
                 document.getElementById('config-presentacion-texto1').value = config.presentacionTexto1 || '';
                 document.getElementById('config-presentacion-texto2').value = config.presentacionTexto2 || '';
+                document.getElementById('config-presentacion-texto3').value = config.presentacionTexto3 || '';
                 document.getElementById('config-presentacion-nombre').value = config.presentacionNombre || '';
+                document.getElementById('config-presentacion-emoji').value = config.presentacionEmoji || '';
                 document.getElementById('config-wa').value = config.whatsapp;
                 document.getElementById('config-ig').value = config.instagram;
                 document.getElementById('config-email').value = config.email;
+                document.getElementById('config-wa-mensaje').value = config.waMensaje || '';
+                document.getElementById('config-footer').value = config.footer || '';
+                document.getElementById('config-logo').value = config.logo || '';
+                
+                // Cargar personalización
+                if (config.colorPrincipal) document.getElementById('color-principal').value = config.colorPrincipal;
+                if (config.colorSecundario) document.getElementById('color-secundario').value = config.colorSecundario;
+                if (config.intensidadBrillo) document.getElementById('intensidad-brillo').value = config.intensidadBrillo;
+                if (config.anillosLogo) document.getElementById('config-anillos-logo').value = config.anillosLogo;
+                document.getElementById('efecto-particulas').checked = config.efectoParticulas !== false;
+                document.getElementById('efecto-cursor').checked = config.efectoCursor !== false;
+                document.getElementById('efecto-animaciones').checked = config.efectoAnimaciones !== false;
+                document.getElementById('modo-mantenimiento').checked = config.modoMantenimiento || false;
+                
+                // Actualizar preview
+                actualizarPreviewPresentacion();
                 
                 actualizarStats();
                 renderAdmin();
@@ -1762,11 +2412,112 @@
             input.value = '';
         }
 
+        // Aplicar configuraciones guardadas al cargar
+        if (config.tituloPagina) {
+            document.title = config.tituloPagina + ' — by Florencia';
+            document.querySelector('h1').textContent = config.tituloPagina.toLowerCase();
+        }
+        if (config.tagline) {
+            document.querySelector('.tagline').innerHTML = 'by <span>' + config.tagline + '</span>';
+        }
+        if (config.footer) {
+            document.querySelector('footer p').innerHTML = config.footer.replace('♥', '<span>♥</span>');
+        }
+        if (config.logo) {
+            document.querySelector('.logo-img').src = config.logo;
+        }
+        
         render();
         actualizarPresentacion();
         actualizarLinks();
+        
+        // Verificar modo mantenimiento
+        if (config.modoMantenimiento) {
+            document.getElementById('grid').innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                    <p style="font-size: 3rem; margin-bottom: 20px;">🔧</p>
+                    <h3 style="color: var(--rosa-flow); margin-bottom: 15px;">modo mantenimiento activado</h3>
+                    <p style="color: var(--gris);">estamos actualizando el catálogo, volvé pronto ✨</p>
+                </div>
+            `;
+        }
         document.getElementById('modal').addEventListener('click', e => {
             if (e.target.id === 'modal') cerrarModal();
+        });
+
+        /* EFECTOS ESPECIALES SUAVES */
+        
+        // Cursor glow sutil (solo en desktop)
+        if (!window.matchMedia('(pointer: coarse)').matches) {
+            const cursorGlow = document.createElement('div');
+            cursorGlow.className = 'cursor-glow';
+            document.body.appendChild(cursorGlow);
+            
+            let mouseX = 0, mouseY = 0;
+            let currentX = 0, currentY = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            function animateCursor() {
+                currentX += (mouseX - currentX) * 0.1;
+                currentY += (mouseY - currentY) * 0.1;
+                cursorGlow.style.left = currentX + 'px';
+                cursorGlow.style.top = currentY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
+        
+        // Scroll reveal suave
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+        
+        // Aplicar reveal a secciones
+        document.querySelectorAll('.sobre-mi, .contacto-section, .titulo-seccion').forEach(el => {
+            el.classList.add('reveal');
+            observer.observe(el);
+        });
+        
+        // Efecto paralaje sutil en el fondo al hacer scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset;
+                    const parallax = document.querySelector('body::before');
+                    if (parallax) {
+                        parallax.style.transform = `translateY(${scrolled * 0.05}px)`;
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        
+        // Efecto de brillo sutil en las tarjetas al entrar en viewport
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, { threshold: 0.2 });
+        
+        document.querySelectorAll('.producto-card').forEach(card => {
+            cardObserver.observe(card);
         });
     </script>
 </body>
