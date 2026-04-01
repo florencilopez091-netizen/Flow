@@ -1863,8 +1863,8 @@
             
             try {
                 // Traer estado real de productos y config desde Supabase
-                const productosData = await supabaseGet('productos', 'activo=eq.true&select=id,nombre,precio,destacado,agotado,link_mercadopago');
-                const configData = await supabaseGet('config', 'select=whatsapp,instagram,presentacion_titulo,presentacion_texto1,presentacion_texto2,presentacion_nombre,mensaje_wp&limit=1');
+                const productosData = await supabaseGet('productos', 'activo=eq.true&select=*');
+                const configData = await supabaseGet('config', 'select=*&limit=1');
                 
                 // Crear un "hash" simple comparando el contenido serializado
                 const hashRemoto = JSON.stringify(productosData) + '||' + JSON.stringify(configData);
