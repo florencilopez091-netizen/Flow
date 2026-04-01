@@ -563,10 +563,11 @@
         }
 
         .sobre-mi-texto p {
-            color: var(--gris);
+            color: rgba(255, 255, 255, 0.95);
             font-size: 1rem;
             line-height: 1.9;
             margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .firma {
@@ -1046,10 +1047,10 @@
                 <img src="logo-flow.png" alt="Florencia">
             </div>
             <div class="sobre-mi-texto">
-                <h3>hola, soy flor ✌️</h3>
-                <p>diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.</p>
-                <p>uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫</p>
-                <p class="firma">— florencia</p>
+                <h3 id="presentacion-titulo">hola, soy flor ✌️</h3>
+                <p id="presentacion-texto1">diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.</p>
+                <p id="presentacion-texto2">uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫</p>
+                <p class="firma">— <span id="presentacion-nombre">florencia</span></p>
             </div>
         </div>
     </section>
@@ -1158,10 +1159,31 @@
                 </div>
 
                 <div class="admin-content" id="tab-config">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">📅 información general</h4>
                     <div class="form-group">
                         <label>año del catálogo</label>
                         <input type="number" id="config-anio" value="2024">
                     </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">💬 sección "sobre mí"</h4>
+                    <div class="form-group">
+                        <label>título</label>
+                        <input type="text" id="config-presentacion-titulo" placeholder="hola, soy flor ✌️">
+                    </div>
+                    <div class="form-group">
+                        <label>primer párrafo</label>
+                        <textarea id="config-presentacion-texto1" rows="3" placeholder="diseño y hago joyas..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>segundo párrafo</label>
+                        <textarea id="config-presentacion-texto2" rows="3" placeholder="uso materiales de buena calidad..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>firma (nombre)</label>
+                        <input type="text" id="config-presentacion-nombre" placeholder="florencia">
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📱 contacto</h4>
                     <div class="form-group">
                         <label>whatsapp</label>
                         <input type="text" id="config-wa" placeholder="5490000000000">
@@ -1174,7 +1196,7 @@
                         <label>email</label>
                         <input type="email" id="config-email" placeholder="email@ejemplo.com">
                     </div>
-                    <button class="btn-primario" onclick="guardarConfig()">guardar</button>
+                    <button class="btn-primario" onclick="guardarConfig()">guardar cambios</button>
                 </div>
 
                 <div class="admin-content" id="tab-datos">
@@ -1222,11 +1244,16 @@
 
         function guardarConfig() {
             config.anio = document.getElementById('config-anio').value || '2024';
+            config.presentacionTitulo = document.getElementById('config-presentacion-titulo').value || 'hola, soy flor ✌️';
+            config.presentacionTexto1 = document.getElementById('config-presentacion-texto1').value || 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.';
+            config.presentacionTexto2 = document.getElementById('config-presentacion-texto2').value || 'uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫';
+            config.presentacionNombre = document.getElementById('config-presentacion-nombre').value || 'florencia';
             config.whatsapp = document.getElementById('config-wa').value || config.whatsapp;
             config.instagram = document.getElementById('config-ig').value || config.instagram;
             config.email = document.getElementById('config-email').value || config.email;
             localStorage.setItem('flor_config', JSON.stringify(config));
             document.getElementById('anio-catalogo').textContent = config.anio;
+            actualizarPresentacion();
             actualizarLinks();
             alert('configuración guardada ✓');
         }
@@ -1235,6 +1262,13 @@
             document.getElementById('link-wa').href = `https://wa.me/${config.whatsapp}`;
             document.getElementById('link-ig').href = `https://instagram.com/${config.instagram.replace('@', '')}`;
             document.getElementById('link-email').href = `mailto:${config.email}`;
+        }
+
+        function actualizarPresentacion() {
+            document.getElementById('presentacion-titulo').textContent = config.presentacionTitulo || 'hola, soy flor ✌️';
+            document.getElementById('presentacion-texto1').textContent = config.presentacionTexto1 || 'diseño y hago joyas artesanales con onda tattoo. cada pieza es única, pensada para quienes buscan algo diferente y con personalidad.';
+            document.getElementById('presentacion-texto2').textContent = config.presentacionTexto2 || 'uso materiales de buena calidad y trato de que cada diseño tenga ese toque especial, como un tattoo que te acompaña para siempre 💫';
+            document.getElementById('presentacion-nombre').textContent = config.presentacionNombre || 'florencia';
         }
 
         function render() {
@@ -1313,6 +1347,10 @@
                 document.getElementById('login-error').style.display = 'none';
                 
                 document.getElementById('config-anio').value = config.anio;
+                document.getElementById('config-presentacion-titulo').value = config.presentacionTitulo || '';
+                document.getElementById('config-presentacion-texto1').value = config.presentacionTexto1 || '';
+                document.getElementById('config-presentacion-texto2').value = config.presentacionTexto2 || '';
+                document.getElementById('config-presentacion-nombre').value = config.presentacionNombre || '';
                 document.getElementById('config-wa').value = config.whatsapp;
                 document.getElementById('config-ig').value = config.instagram;
                 document.getElementById('config-email').value = config.email;
@@ -1472,6 +1510,7 @@
         }
 
         render();
+        actualizarPresentacion();
         actualizarLinks();
         document.getElementById('modal').addEventListener('click', e => {
             if (e.target.id === 'modal') cerrarModal();
