@@ -2055,22 +2055,6 @@
 
         let filtroActivo = 'todos';
 
-        function guardar() {
-            localStorage.setItem('flor_productos', JSON.stringify(productos));
-            // También sincronizar con Supabase en segundo plano
-            if (!modoOffline) {
-                // No esperamos la respuesta para que sea más rápido
-                guardarProductosBatch();
-            }
-        }
-        
-        // Guardar todos los productos en Supabase (para sincronización batch)
-        async function guardarProductosBatch() {
-            for (const producto of productos) {
-                await guardarProductoSupabase(producto);
-            }
-        }
-
         async function guardarConfig() {
             config.anio = document.getElementById('config-anio').value || '2024';
             config.presentacionTitulo = document.getElementById('config-presentacion-titulo').value || 'hola, soy flor ✌️';
@@ -2092,6 +2076,8 @@
             const ahora = new Date().toISOString();
             localStorage.setItem('flor_last_server_update', ahora);
             localStorage.setItem('flor_cambio_reciente', ahora);
+            // Resetear hash para que otros dispositivos detecten el cambio
+            localStorage.removeItem('flor_hash_remoto');
             
             document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarPresentacion();
@@ -2624,7 +2610,6 @@
             if (!modoOffline) {
                 cargarProductos();
                 cargarConfig();
-                console.log('Sincronizacion automatica');
             }
         }, 30000);
     </script>
