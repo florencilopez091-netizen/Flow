@@ -34,14 +34,14 @@
             overflow-x: hidden;
         }
 
-        /* FONDO CON TUS FLORES DE HIBISCO - AHORA SE VE MEJOR */
+        /* FONDO CON TUS FLORES DE HIBISCO - MOVIMIENTO SUAVE */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
             background-image: url('flores-fondo.png');
             background-size: 250px auto;
             background-repeat: repeat;
@@ -50,6 +50,22 @@
             pointer-events: none;
             z-index: -1;
             filter: contrast(1.2) brightness(0.8);
+            animation: flores-flotando 25s ease-in-out infinite;
+        }
+
+        @keyframes flores-flotando {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg) scale(1); 
+            }
+            25% { 
+                transform: translate(1%, -1%) rotate(0.5deg) scale(1.02); 
+            }
+            50% { 
+                transform: translate(-0.5%, 1%) rotate(-0.3deg) scale(1); 
+            }
+            75% { 
+                transform: translate(0.5%, 0.5%) rotate(0.2deg) scale(1.01); 
+            }
         }
 
         body::after {
@@ -1371,7 +1387,7 @@
                         </div>
                     </div>
 
-                    <button class="btn-sec" onclick="mostrarForm()">+ nuevo producto</button>
+                    <button class="btn-sec" onclick="mostrarForm()">+ nuevo producto (agrega un producto nuevo al catálogo)</button>
 
                     <div class="form-admin" id="form">
                         <input type="hidden" id="pid">
@@ -1433,7 +1449,7 @@
                             <div class="stat-label">este mes</div>
                         </div>
                     </div>
-                    <button class="btn-sec" onclick="resetearContador()" style="width: 100%; margin-bottom: 10px;">🔄 resetear contador</button>
+                    <button class="btn-sec" onclick="resetearContador()" style="width: 100%; margin-bottom: 10px;">🔄 resetear contador (vuelve a cero las visitas)</button>
                     
                     <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📦 resumen de productos</h4>
                     <div class="stats-grid">
@@ -1497,7 +1513,7 @@
                         <label>email</label>
                         <input type="email" id="config-email" placeholder="email@ejemplo.com">
                     </div>
-                    <button class="btn-primario" onclick="guardarConfig()">guardar cambios</button>
+                    <button class="btn-primario" onclick="guardarConfig()">guardar cambios (aplica las modificaciones en la página)</button>
                 </div>
 
                 <div class="admin-content" id="tab-herramientas">
@@ -1510,33 +1526,33 @@
                     </div>
                     
                     <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">⚡ herramientas</h4>
-                    <button class="btn-sec" onclick="duplicarUltimo()" style="width: 100%; margin-bottom: 10px;">📋 duplicar último producto</button>
-                    <button class="btn-sec" onclick="ordenarPorPrecio('asc')" style="width: 100%; margin-bottom: 10px;">🔽 ordenar por precio (menor)</button>
-                    <button class="btn-sec" onclick="ordenarPorPrecio('desc')" style="width: 100%; margin-bottom: 10px;">🔼 ordenar por precio (mayor)</button>
-                    <button class="btn-sec" onclick="ordenarAlfabeticamente()" style="width: 100%; margin-bottom: 10px;">🔤 ordenar alfabéticamente</button>
-                    <button class="btn-sec" onclick="quitarDestacados()" style="width: 100%; margin-bottom: 10px;">❌ quitar todos los destacados</button>
+                    <button class="btn-sec" onclick="duplicarUltimo()" style="width: 100%; margin-bottom: 10px;">📋 duplicar último producto (crea una copia del último item)</button>
+                    <button class="btn-sec" onclick="ordenarPorPrecio('asc')" style="width: 100%; margin-bottom: 10px;">🔽 ordenar por precio (menor a mayor)</button>
+                    <button class="btn-sec" onclick="ordenarPorPrecio('desc')" style="width: 100%; margin-bottom: 10px;">🔼 ordenar por precio (mayor a menor)</button>
+                    <button class="btn-sec" onclick="ordenarAlfabeticamente()" style="width: 100%; margin-bottom: 10px;">🔤 ordenar alfabéticamente (A-Z)</button>
+                    <button class="btn-sec" onclick="quitarDestacados()" style="width: 100%; margin-bottom: 10px;">❌ quitar todos los destacados (saca la etiqueta 🔥 de todos)</button>
                     
                     <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🚨 zona peligrosa</h4>
-                    <button class="btn-sec" onclick="borrarTodo()" style="width: 100%; background: rgba(255,0,0,0.1); border-color: #ff4444; color: #ff4444;">🗑️ eliminar TODOS los productos</button>
+                    <button class="btn-sec" onclick="borrarTodo()" style="width: 100%; background: rgba(255,0,0,0.1); border-color: #ff4444; color: #ff4444;">🗑️ eliminar TODOS los productos (⚠️ acción permanente)</button>
                 </div>
 
                 <div class="admin-content" id="tab-datos">
                     <div class="export-section">
-                        <p>📥 exportar todos los datos</p>
+                        <p>📥 exportar todos los datos (guarda backup en tu dispositivo)</p>
                         <button class="btn-sec" onclick="exportarDatos()">descargar JSON</button>
                     </div>
                     <div class="export-section">
-                        <p>📤 importar datos</p>
+                        <p>📤 importar datos (carga un backup anterior)</p>
                         <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importarDatos(this)">
                         <button class="btn-sec" onclick="document.getElementById('import-file').click()">seleccionar archivo</button>
                     </div>
                     <div class="export-section" style="margin-top: 15px;">
-                        <p>📋 copiar lista al portapapeles</p>
+                        <p>📋 copiar lista al portapapeles (para pegar en WhatsApp/Notas)</p>
                         <button class="btn-sec" onclick="copiarLista()">copiar lista de productos</button>
                     </div>
                 </div>
 
-                <button class="btn-sec" onclick="logout()" style="margin-top: 20px; width: 100%;">🔒 cerrar sesión</button>
+                <button class="btn-sec" onclick="logout()" style="margin-top: 20px; width: 100%;">🔒 cerrar sesión (salir del panel de admin)</button>
             </div>
         </div>
     </div>
@@ -1847,7 +1863,7 @@
                         <strong style="font-size: 0.9rem;">${p.nombre}</strong>
                         <small style="display: block; color: #888;">$${p.precio} · ${p.categoria}</small>
                     </div>
-                    <button class="btn-edit" onclick="editar(${p.id}); cambiarTab('productos', document.querySelectorAll('.admin-tab')[0])" style="font-size: 0.75rem; padding: 4px 10px;">editar</button>
+                    <button class="btn-edit" onclick="editar(${p.id}); cambiarTab('productos', document.querySelectorAll('.admin-tab')[0])" style="font-size: 0.75rem; padding: 4px 10px;" title="modificar este producto">editar ✏️</button>
                 </div>
             `).join('');
         }
@@ -2001,8 +2017,8 @@
                         </small>
                     </div>
                     <div>
-                        <button class="btn-edit" onclick="editar(${p.id})">editar</button>
-                        <button class="btn-delete" onclick="eliminar(${p.id})">borrar</button>
+                        <button class="btn-edit" onclick="editar(${p.id})" title="modificar producto">editar ✏️</button>
+                        <button class="btn-delete" onclick="eliminar(${p.id})" title="eliminar producto permanentemente">borrar 🗑️</button>
                     </div>
                 </div>
             `).join('');
