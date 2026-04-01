@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- META TAGS ANTI-CACHE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Last-Modified" content="0">
+    
     <title>Collares con Flow — by Florencia</title>
+    
+    <!-- SISTEMA AUTO-UPDATE: Detecta cambios automáticamente -->
+    <meta name="auto-update" content="enabled">
     <!-- FAVICON FLOR NEGRA -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 20 C55 35 70 35 75 50 C80 55 75 70 60 75 C65 85 55 90 50 85 C45 90 35 85 40 75 C25 70 20 55 25 50 C30 35 45 35 50 20' fill='%23000' stroke='%23ff1493' stroke-width='2'/><circle cx='50' cy='55' r='8' fill='%23ff1493'/></svg>" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1519,7 +1529,27 @@
                 </div>
 
                 <div class="admin-content" id="tab-herramientas">
-                    <h4 style="margin-bottom: 20px; color: var(--gris);">☁️ sincronización</h4>
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">✅ sistema automático</h4>
+                    <div style="background: rgba(0, 209, 132, 0.1); border: 1px solid rgba(0, 209, 132, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: var(--gris); font-size: 0.85rem; margin-bottom: 10px;">
+                            ✅ <strong>La página se actualiza sola automáticamente</strong>
+                        </p>
+                        <p style="color: #888; font-size: 0.75rem; line-height: 1.5;">
+                            • Los cambios se detectan solos cada 10 segundos<br>
+                            • Los clientes ven la versión nueva sin hacer nada<br>
+                            • Si hay cambios, la página muestra aviso y se recarga
+                        </p>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🆘 solo si hay problemas</h4>
+                    <button class="btn-sec" onclick="forzarActualizacion()" style="width: 100%; margin-bottom: 10px;">
+                        🧹 borrar caché y recargar (solo si algo no se ve bien)
+                    </button>
+                    <p style="color: #666; font-size: 0.75rem; margin-bottom: 20px;">
+                        Solo usar en caso de emergencia si los cambios no se ven
+                    </p>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">☁️ sincronización</h4>
                     <div style="background: rgba(255,20,147,0.1); border: 1px solid rgba(255,20,147,0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
                         <p style="color: var(--gris); font-size: 0.85rem; margin-bottom: 10px;">
                             Estado: <span id="estado-sync" style="color: var(--rosa-flow); font-weight: bold;">cargando...</span>
@@ -1810,6 +1840,124 @@
             document.getElementById('anio-catalogo').textContent = config.anio;
         }
         
+        // ═══════════════════════════════════════════════════════════════
+        // SISTEMA AUTO-UPDATE: TODO AUTOMÁTICO, SIN INTERVENCIÓN
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Guardar timestamp de última actualización
+        let ultimaActualizacion = localStorage.getItem('flor_last_update') || '0';
+        
+        // Función para detectar si hay cambios nuevos en Supabase
+        async function verificarCambiosNuevos() {
+            if (!supabaseClient || modoOffline) return false;
+            
+            try {
+                // Obtener el producto más reciente modificado
+                const { data: ultimoProducto, error: err1 } = await supabaseClient
+                    .from('productos')
+                    .select('updated_at')
+                    .order('updated_at', { ascending: false })
+                    .limit(1);
+                
+                // Obtener config más reciente
+                const { data: ultimaConfig, error: err2 } = await supabaseClient
+                    .from('config')
+                    .select('updated_at')
+                    .single();
+                
+                if (err1 || err2) return false;
+                
+                // Encontrar la fecha más reciente
+                let fechaRemota = '0';
+                if (ultimoProducto && ultimoProducto[0]) {
+                    fechaRemota = ultimoProducto[0].updated_at;
+                }
+                if (ultimaConfig && ultimaConfig.updated_at > fechaRemota) {
+                    fechaRemota = ultimaConfig.updated_at;
+                }
+                
+                // Comparar con lo que tenemos guardado
+                const fechaLocal = localStorage.getItem('flor_last_server_update') || '0';
+                
+                if (fechaRemota > fechaLocal) {
+                    console.log('🔄 Detectados cambios nuevos en el servidor');
+                    localStorage.setItem('flor_last_server_update', fechaRemota);
+                    return true;
+                }
+                
+                return false;
+            } catch (e) {
+                console.error('Error verificando cambios:', e);
+                return false;
+            }
+        }
+        
+        // Función para actualizar automáticamente si hay cambios
+        async function autoActualizar() {
+            const hayCambios = await verificarCambiosNuevos();
+            if (hayCambios) {
+                console.log('🔄 Actualizando automáticamente...');
+                await sincronizarTodo();
+                
+                // Si el usuario está en la página, mostrar notificación sutil
+                mostrarNotificacionUpdate();
+            }
+        }
+        
+        // Mostrar notificación sutil de actualización
+        function mostrarNotificacionUpdate() {
+            // Verificar si ya existe la notificación
+            if (document.getElementById('notificacion-update')) return;
+            
+            const notif = document.createElement('div');
+            notif.id = 'notificacion-update';
+            notif.innerHTML = `
+                <div style="
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 209, 132, 0.95);
+                    color: #000;
+                    padding: 12px 24px;
+                    border-radius: 100px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    z-index: 9999;
+                    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                    animation: fadeInUp 0.3s ease;
+                    cursor: pointer;
+                " onclick="location.reload()">
+                    🔄 Página actualizada con cambios nuevos - Tocá acá para recargar
+                </div>
+            `;
+            document.body.appendChild(notif);
+            
+            // Auto-recargar después de 5 segundos si el usuario no tocó
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
+        }
+        
+        // Verificar cambios cada 10 segundos (muy frecuente para estar siempre actualizado)
+        setInterval(autoActualizar, 10000);
+        
+        // También verificar cuando la pestaña vuelve a estar activa
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                autoActualizar();
+            }
+        });
+        
+        // Verificar al cargar la página
+        setTimeout(autoActualizar, 2000);
+        
+        // Función para limpiar caché (solo para emergencias, sigue estando disponible)
+        function forzarActualizacion() {
+            localStorage.clear();
+            location.reload(true);
+        }
+        
         const USERNAME = 'FlorenciLopez';
         const PASSWORD = 'Estoyreloquita';
 
@@ -1930,9 +2078,13 @@
             
             // Guardar en localStorage
             localStorage.setItem('flor_config', JSON.stringify(config));
+            localStorage.setItem('flor_last_update', Date.now().toString());
             
             // Sincronizar con Supabase
             await guardarConfigSupabase();
+            
+            // Marcar timestamp de servidor
+            localStorage.setItem('flor_last_server_update', new Date().toISOString());
             
             document.getElementById('anio-catalogo').textContent = config.anio;
             actualizarPresentacion();
@@ -2164,12 +2316,13 @@
         function actualizarEstadoSync() {
             const estado = document.getElementById('estado-sync');
             const ultima = document.getElementById('ultima-sync');
+            
             if (estado) {
                 if (modoOffline) {
                     estado.textContent = 'modo offline (solo local)';
                     estado.style.color = '#ff6b6b';
                 } else {
-                    estado.textContent = 'conectado ☁️';
+                    estado.textContent = 'conectado ☁️ (auto-update activo)';
                     estado.style.color = '#00d084';
                 }
             }
@@ -2177,6 +2330,14 @@
                 ultima.textContent = new Date().toLocaleTimeString();
             }
         }
+        
+        // Escuchar cambios desde otros dispositivos (sincronización en tiempo real)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'flor_sync_notif') {
+                console.log('🔄 Cambio detectado desde otro dispositivo');
+                autoActualizar();
+            }
+        });
         
         function duplicarUltimo() {
             if (productos.length === 0) {
@@ -2283,10 +2444,12 @@
 
             // Guardar en localStorage
             localStorage.setItem('flor_productos', JSON.stringify(productos));
+            localStorage.setItem('flor_last_update', Date.now().toString());
             
             // Sincronizar con Supabase
-            if (supabase && !modoOffline && productoGuardado) {
+            if (supabaseClient && !modoOffline && productoGuardado) {
                 await guardarProductoSupabase(productoGuardado);
+                localStorage.setItem('flor_last_server_update', new Date().toISOString());
             }
             
             render();
@@ -2313,9 +2476,11 @@
             if (confirm('¿borrar este producto?')) {
                 productos = productos.filter(p => p.id !== id);
                 localStorage.setItem('flor_productos', JSON.stringify(productos));
+                localStorage.setItem('flor_last_update', Date.now().toString());
                 
                 // Sincronizar con Supabase
                 await eliminarProductoSupabase(id);
+                localStorage.setItem('flor_last_server_update', new Date().toISOString());
                 
                 render();
                 actualizarStats();
