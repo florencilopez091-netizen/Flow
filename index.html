@@ -1352,9 +1352,11 @@
                 <h3>⚡ panel de control</h3>
                 
                 <div class="admin-tabs">
-                    <button class="admin-tab activo" onclick="cambiarTab('productos', this)">productos</button>
-                    <button class="admin-tab" onclick="cambiarTab('config', this)">config</button>
-                    <button class="admin-tab" onclick="cambiarTab('datos', this)">datos</button>
+                    <button class="admin-tab activo" onclick="cambiarTab('productos', this)">📦 productos</button>
+                    <button class="admin-tab" onclick="cambiarTab('estadisticas', this)">📊 stats</button>
+                    <button class="admin-tab" onclick="cambiarTab('config', this)">⚙️ config</button>
+                    <button class="admin-tab" onclick="cambiarTab('herramientas', this)">🛠️ tools</button>
+                    <button class="admin-tab" onclick="cambiarTab('datos', this)">💾 datos</button>
                 </div>
 
                 <div class="admin-content activo" id="tab-productos">
@@ -1411,6 +1413,52 @@
                     <div id="lista"></div>
                 </div>
 
+                <div class="admin-content" id="tab-estadisticas">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">👀 visitas a la página</h4>
+                    <div class="stats-grid" style="margin-bottom: 25px;">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-visitas-hoy" style="color: #00d084;">0</div>
+                            <div class="stat-label">visitas hoy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-visitas-total">0</div>
+                            <div class="stat-label">visitas totales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-visitas-semana" style="color: var(--rosa-flow);">0</div>
+                            <div class="stat-label">esta semana</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-visitas-mes" style="color: var(--cyan-neon);">0</div>
+                            <div class="stat-label">este mes</div>
+                        </div>
+                    </div>
+                    <button class="btn-sec" onclick="resetearContador()" style="width: 100%; margin-bottom: 10px;">🔄 resetear contador</button>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📦 resumen de productos</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-total-prod">0</div>
+                            <div class="stat-label">total productos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-agotados" style="color: #ff6b6b;">0</div>
+                            <div class="stat-label">agotados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-valor-total" style="color: #00d084;">$0</div>
+                            <div class="stat-label">valor inventario</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-precio-prom">$0</div>
+                            <div class="stat-label">precio promedio</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">📈 por categoría</h4>
+                    <div id="stats-categorias"></div>
+                </div>
+
                 <div class="admin-content" id="tab-config">
                     <h4 style="margin-bottom: 20px; color: var(--gris);">📅 información general</h4>
                     <div class="form-group">
@@ -1452,6 +1500,26 @@
                     <button class="btn-primario" onclick="guardarConfig()">guardar cambios</button>
                 </div>
 
+                <div class="admin-content" id="tab-herramientas">
+                    <h4 style="margin-bottom: 20px; color: var(--gris);">🔧 acciones rápidas</h4>
+                    
+                    <div class="form-group">
+                        <label>🔍 buscar producto</label>
+                        <input type="text" id="buscar-producto" placeholder="escribí el nombre..." oninput="buscarProductoAdmin(this.value)">
+                        <div id="resultados-busqueda" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">⚡ herramientas</h4>
+                    <button class="btn-sec" onclick="duplicarUltimo()" style="width: 100%; margin-bottom: 10px;">📋 duplicar último producto</button>
+                    <button class="btn-sec" onclick="ordenarPorPrecio('asc')" style="width: 100%; margin-bottom: 10px;">🔽 ordenar por precio (menor)</button>
+                    <button class="btn-sec" onclick="ordenarPorPrecio('desc')" style="width: 100%; margin-bottom: 10px;">🔼 ordenar por precio (mayor)</button>
+                    <button class="btn-sec" onclick="ordenarAlfabeticamente()" style="width: 100%; margin-bottom: 10px;">🔤 ordenar alfabéticamente</button>
+                    <button class="btn-sec" onclick="quitarDestacados()" style="width: 100%; margin-bottom: 10px;">❌ quitar todos los destacados</button>
+                    
+                    <h4 style="margin: 25px 0 20px; color: var(--gris); border-top: 1px solid rgba(255,20,147,0.2); padding-top: 20px;">🚨 zona peligrosa</h4>
+                    <button class="btn-sec" onclick="borrarTodo()" style="width: 100%; background: rgba(255,0,0,0.1); border-color: #ff4444; color: #ff4444;">🗑️ eliminar TODOS los productos</button>
+                </div>
+
                 <div class="admin-content" id="tab-datos">
                     <div class="export-section">
                         <p>📥 exportar todos los datos</p>
@@ -1461,6 +1529,10 @@
                         <p>📤 importar datos</p>
                         <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importarDatos(this)">
                         <button class="btn-sec" onclick="document.getElementById('import-file').click()">seleccionar archivo</button>
+                    </div>
+                    <div class="export-section" style="margin-top: 15px;">
+                        <p>📋 copiar lista al portapapeles</p>
+                        <button class="btn-sec" onclick="copiarLista()">copiar lista de productos</button>
                     </div>
                 </div>
 
@@ -1479,6 +1551,77 @@
             instagram: '@florencialopez',
             email: 'flor@email.com'
         };
+
+        /* CONTADOR DE VISITAS REAL */
+        function registrarVisita() {
+            const hoy = new Date().toDateString();
+            const semana = getSemanaActual();
+            const mes = new Date().toISOString().slice(0, 7); // YYYY-MM
+            
+            let visitas = JSON.parse(localStorage.getItem('flor_visitas')) || {
+                total: 0,
+                porDia: {},
+                porSemana: {},
+                porMes: {},
+                ultimaVisita: null
+            };
+            
+            // Incrementar contadores
+            visitas.total++;
+            visitas.porDia[hoy] = (visitas.porDia[hoy] || 0) + 1;
+            visitas.porSemana[semana] = (visitas.porSemana[semana] || 0) + 1;
+            visitas.porMes[mes] = (visitas.porMes[mes] || 0) + 1;
+            visitas.ultimaVisita = new Date().toISOString();
+            
+            localStorage.setItem('flor_visitas', JSON.stringify(visitas));
+        }
+        
+        function getSemanaActual() {
+            const ahora = new Date();
+            const inicioSemana = new Date(ahora.setDate(ahora.getDate() - ahora.getDay()));
+            return inicioSemana.toDateString();
+        }
+        
+        function obtenerEstadisticasVisitas() {
+            const hoy = new Date().toDateString();
+            const semana = getSemanaActual();
+            const mes = new Date().toISOString().slice(0, 7);
+            
+            let visitas = JSON.parse(localStorage.getItem('flor_visitas')) || {
+                total: 0, porDia: {}, porSemana: {}, porMes: {}
+            };
+            
+            return {
+                hoy: visitas.porDia[hoy] || 0,
+                total: visitas.total,
+                semana: visitas.porSemana[semana] || 0,
+                mes: visitas.porMes[mes] || 0
+            };
+        }
+        
+        function actualizarStatsVisitas() {
+            const stats = obtenerEstadisticasVisitas();
+            const statHoy = document.getElementById('stat-visitas-hoy');
+            const statTotal = document.getElementById('stat-visitas-total');
+            const statSemana = document.getElementById('stat-visitas-semana');
+            const statMes = document.getElementById('stat-visitas-mes');
+            
+            if (statHoy) statHoy.textContent = stats.hoy;
+            if (statTotal) statTotal.textContent = stats.total;
+            if (statSemana) statSemana.textContent = stats.semana;
+            if (statMes) statMes.textContent = stats.mes;
+        }
+        
+        function resetearContador() {
+            if (confirm('¿estás segura de querer resetear el contador de visitas?')) {
+                localStorage.removeItem('flor_visitas');
+                actualizarStatsVisitas();
+                alert('contador reseteado ✓');
+            }
+        }
+        
+        // Registrar esta visita
+        registrarVisita();
 
         document.getElementById('anio-catalogo').textContent = config.anio;
 
@@ -1609,6 +1752,7 @@
                 document.getElementById('config-email').value = config.email;
                 
                 actualizarStats();
+                actualizarStatsVisitas();
                 renderAdmin();
             } else {
                 document.getElementById('login-error').textContent = 'usuario o contraseña incorrectos';
@@ -1630,8 +1774,147 @@
         }
 
         function actualizarStats() {
-            document.getElementById('stat-total').textContent = productos.length;
-            document.getElementById('stat-destacados').textContent = productos.filter(p => p.destacado).length;
+            // Stats de productos (pestaña productos)
+            const statTotal = document.getElementById('stat-total');
+            const statDestacados = document.getElementById('stat-destacados');
+            if (statTotal) statTotal.textContent = productos.length;
+            if (statDestacados) statDestacados.textContent = productos.filter(p => p.destacado).length;
+            
+            // Stats extendidas (pestaña estadísticas)
+            const statTotalProd = document.getElementById('stat-total-prod');
+            const statAgotados = document.getElementById('stat-agotados');
+            const statValorTotal = document.getElementById('stat-valor-total');
+            const statPrecioProm = document.getElementById('stat-precio-prom');
+            
+            if (statTotalProd) statTotalProd.textContent = productos.length;
+            if (statAgotados) statAgotados.textContent = productos.filter(p => p.agotado).length;
+            
+            if (productos.length > 0) {
+                const valorTotal = productos.reduce((sum, p) => sum + (p.agotado ? 0 : p.precio), 0);
+                const precioProm = productos.reduce((sum, p) => sum + p.precio, 0) / productos.length;
+                if (statValorTotal) statValorTotal.textContent = '$' + valorTotal.toLocaleString();
+                if (statPrecioProm) statPrecioProm.textContent = '$' + Math.round(precioProm).toLocaleString();
+            } else {
+                if (statValorTotal) statValorTotal.textContent = '$0';
+                if (statPrecioProm) statPrecioProm.textContent = '$0';
+            }
+            
+            // Stats por categoría
+            const catsDiv = document.getElementById('stats-categorias');
+            if (catsDiv) {
+                const categorias = {};
+                productos.forEach(p => {
+                    categorias[p.categoria] = (categorias[p.categoria] || 0) + 1;
+                });
+                
+                if (Object.keys(categorias).length === 0) {
+                    catsDiv.innerHTML = '<p style="color: var(--gris); font-size: 0.85rem;">no hay productos</p>';
+                } else {
+                    catsDiv.innerHTML = Object.entries(categorias).map(([cat, count]) => `
+                        <div class="admin-item" style="padding: 10px 15px; margin-bottom: 8px;">
+                            <span style="text-transform: capitalize;">${cat}</span>
+                            <span style="color: var(--rosa-flow); font-weight: bold;">${count}</span>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            // Actualizar visitas
+            actualizarStatsVisitas();
+        }
+        
+        /* HERRAMIENTAS DEL ADMIN */
+        function buscarProductoAdmin(query) {
+            const resultadosDiv = document.getElementById('resultados-busqueda');
+            if (!query.trim()) {
+                resultadosDiv.innerHTML = '';
+                return;
+            }
+            
+            const resultados = productos.filter(p => 
+                p.nombre.toLowerCase().includes(query.toLowerCase()) ||
+                p.categoria.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (resultados.length === 0) {
+                resultadosDiv.innerHTML = '<p style="color: var(--gris); font-size: 0.85rem;">no se encontraron productos</p>';
+                return;
+            }
+            
+            resultadosDiv.innerHTML = resultados.map(p => `
+                <div class="admin-item" style="padding: 10px; margin-bottom: 5px;">
+                    <div>
+                        <strong style="font-size: 0.9rem;">${p.nombre}</strong>
+                        <small style="display: block; color: #888;">$${p.precio} · ${p.categoria}</small>
+                    </div>
+                    <button class="btn-edit" onclick="editar(${p.id}); cambiarTab('productos', document.querySelectorAll('.admin-tab')[0])" style="font-size: 0.75rem; padding: 4px 10px;">editar</button>
+                </div>
+            `).join('');
+        }
+        
+        function duplicarUltimo() {
+            if (productos.length === 0) {
+                alert('no hay productos para duplicar');
+                return;
+            }
+            const ultimo = productos[productos.length - 1];
+            const nuevoId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+            const duplicado = { 
+                ...ultimo, 
+                id: nuevoId, 
+                nombre: ultimo.nombre + ' (copia)', 
+                destacado: false 
+            };
+            productos.push(duplicado);
+            guardar();
+            render();
+            actualizarStats();
+            renderAdmin();
+            alert('producto duplicado ✓');
+        }
+        
+        function ordenarPorPrecio(orden) {
+            productos.sort((a, b) => orden === 'asc' ? a.precio - b.precio : b.precio - a.precio);
+            guardar();
+            render();
+            renderAdmin();
+            alert('productos ordenados por precio ✓');
+        }
+        
+        function ordenarAlfabeticamente() {
+            productos.sort((a, b) => a.nombre.localeCompare(b.nombre));
+            guardar();
+            render();
+            renderAdmin();
+            alert('productos ordenados alfabéticamente ✓');
+        }
+        
+        function quitarDestacados() {
+            productos.forEach(p => p.destacado = false);
+            guardar();
+            render();
+            actualizarStats();
+            alert('todos los destacados quitados ✓');
+        }
+        
+        function borrarTodo() {
+            if (confirm('⚠️ ¿ESTÁS SEGURA? Se eliminarán TODOS los productos permanentemente')) {
+                if (confirm('¿Realmente querés borrar todo? Esta acción no se puede deshacer')) {
+                    productos = [];
+                    guardar();
+                    render();
+                    actualizarStats();
+                    renderAdmin();
+                    alert('todos los productos han sido eliminados');
+                }
+            }
+        }
+        
+        function copiarLista() {
+            const texto = productos.map(p => 
+                `• ${p.nombre} - $${p.precio} (${p.categoria})${p.agotado ? ' [AGOTADO]' : ''}${p.destacado ? ' [DESTACADO]' : ''}`
+            ).join('\n');
+            navigator.clipboard.writeText(texto).then(() => alert('lista copiada al portapapeles ✓'));
         }
 
         function mostrarForm() {
@@ -1696,6 +1979,7 @@
                 guardar();
                 render();
                 actualizarStats();
+                actualizarStatsVisitas();
                 renderAdmin();
             }
         }
