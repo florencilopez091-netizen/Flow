@@ -1611,6 +1611,8 @@
         const SUPABASE_URL = 'https://llymnsjyalndnhdonsaw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseW1uc2p5YWxuZG5oZG9uc2F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTkwNTIsImV4cCI6MjA5MDU3NTA1Mn0.E4ksaUzE_tVGNiJT-3lawf94nkN0qTi1zE09FFasQxA';
         
+        // Variable de compatibilidad (usamos fetch directo, no el SDK)
+        let supabaseClient = true;
         let modoOffline = false;
         
         // Headers para todas las peticiones a Supabase
