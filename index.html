@@ -1425,13 +1425,13 @@
                             <input type="text" id="mp" placeholder="https://mpago.la/...">
                         </div>
                         <div class="form-group">
-                            <label>foto del producto</label>
-                            <input type="file" id="foto" accept="image/*" onchange="previewFoto(this)">
+                            <label>foto del producto (URL)</label>
+                            <input type="text" id="foto" placeholder="https://..." oninput="previewFotoUrl(this.value)">
+                            <small style="color: #888; display: block; margin-top: 5px;">click derecho en la imagen → "copiar link de imagen"</small>
                             <div id="foto-preview" style="margin-top: 10px; display: none;">
                                 <img id="foto-img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--rosa-flow);">
                                 <button type="button" onclick="eliminarFoto()" style="display: block; margin-top: 5px; background: transparent; border: 1px solid var(--rosa-flow); color: var(--rosa-flow); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">❌ quitar foto</button>
                             </div>
-                            <input type="hidden" id="foto-base64">
                         </div>
                         <div class="checkbox-group">
                             <label class="checkbox-item">
@@ -2472,7 +2472,7 @@
             const mp = document.getElementById('mp').value.trim();
             const destacado = document.getElementById('chk-destacado').checked;
             const agotado = document.getElementById('chk-agotado').checked;
-            const foto = document.getElementById('foto-base64').value;
+            const foto = document.getElementById('foto').value.trim();
 
             if (!nombre || !precio) {
                 alert('completá nombre y precio');
@@ -2541,7 +2541,7 @@
                 
                 // Cargar foto si existe
                 if (p.foto) {
-                    document.getElementById('foto-base64').value = p.foto;
+                    document.getElementById('foto').value = p.foto;
                     document.getElementById('foto-img').src = p.foto;
                     document.getElementById('foto-preview').style.display = 'block';
                 } else {
@@ -2584,23 +2584,19 @@
             }
         }
 
-        // Funciones para manejar la foto del producto
-        function previewFoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('foto-img').src = e.target.result;
-                    document.getElementById('foto-base64').value = e.target.result;
-                    document.getElementById('foto-preview').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
+        // Funciones para manejar la foto del producto por URL
+        function previewFotoUrl(url) {
+            if (url && url.trim()) {
+                document.getElementById('foto-img').src = url.trim();
+                document.getElementById('foto-preview').style.display = 'block';
+            } else {
+                eliminarFoto();
             }
         }
         
         function eliminarFoto() {
             document.getElementById('foto').value = '';
             document.getElementById('foto-img').src = '';
-            document.getElementById('foto-base64').value = '';
             document.getElementById('foto-preview').style.display = 'none';
         }
 
