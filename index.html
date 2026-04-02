@@ -1425,13 +1425,13 @@
                             <input type="text" id="mp" placeholder="https://mpago.la/...">
                         </div>
                         <div class="form-group">
-                            <label>foto del producto (URL)</label>
-                            <input type="text" id="foto" placeholder="https://..." oninput="previewFotoUrl(this.value)">
-                            <small style="color: #888; display: block; margin-top: 5px;">copiá el link directo de la imagen (click derecho → copiar link de imagen)</small>
+                            <label>foto del producto</label>
+                            <input type="file" id="foto" accept="image/*" onchange="previewFoto(this)">
                             <div id="foto-preview" style="margin-top: 10px; display: none;">
                                 <img id="foto-img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--rosa-flow);">
                                 <button type="button" onclick="eliminarFoto()" style="display: block; margin-top: 5px; background: transparent; border: 1px solid var(--rosa-flow); color: var(--rosa-flow); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">❌ quitar foto</button>
                             </div>
+                            <input type="hidden" id="foto-base64">
                         </div>
                         <div class="checkbox-group">
                             <label class="checkbox-item">
@@ -1699,48 +1699,6 @@
         }
         
         // ═══════════════════════════════════════════════════════════════
-        // FUNCIONES DE STORAGE (SUBIR IMÁGENES)
-        // ═══════════════════════════════════════════════════════════════
-        
-        // Subir archivo a Supabase Storage
-        async function subirImagenStorage(file, nombreArchivo) {
-            if (!file) return null;
-            
-            try {
-                const url = `${SUPABASE_URL}/storage/v1/object/productos/${nombreArchivo}`;
-                console.log('📤 Subiendo imagen a:', url);
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-                        'Content-Type': file.type,
-                        'x-upsert': 'true' -- Sobrescribir si existe
-                    },
-                    body: file
-                });
-                
-                console.log('📤 Upload response:', response.status);
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('📤 Upload error:', errorText);
-                    throw new Error(`Error subiendo imagen: ${response.status}`);
-                }
-                
-                // Obtener URL pública
-                const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/productos/${nombreArchivo}`;
-                console.log('📤 Imagen subida:', publicUrl);
-                return publicUrl;
-                
-            } catch (e) {
-                console.error('❌ Error subiendo a Storage:', e);
-                return null;
-            }
-        }
-        
-        // ═══════════════════════════════════════════════════════════════
         // FUNCIONES DE SINCRONIZACIÓN CON SUPABASE
         // ═══════════════════════════════════════════════════════════════
         
@@ -1795,7 +1753,7 @@
                     const categorias = await supabaseGet('categorias', 'slug=eq.' + producto.categoria);
                     const categoria_id = categorias[0]?.id || 1;
                     
-                    // Preparar datos del producto
+                    // Preparar datos del producto (foto_url solo si no es muy grande)
                     const datosProducto = {
                         nombre: producto.nombre,
                         categoria_id: categoria_id,
@@ -1806,8 +1764,8 @@
                         updated_at: new Date().toISOString()
                     };
                     
-                    // Incluir foto_url si existe (ahora es URL de Storage, no base64)
-                    if (producto.foto) {
+                    // Solo incluir foto si existe y no es muy grande (< 100KB aprox)
+                    if (producto.foto && producto.foto.length < 100000) {
                         datosProducto.foto_url = producto.foto;
                     }
                     
@@ -2501,11 +2459,9 @@
             document.getElementById('cat').value = 'collares';
             document.getElementById('precio').value = '';
             document.getElementById('mp').value = '';
-            document.getElementById('foto').value = '';
             document.getElementById('chk-destacado').checked = false;
             document.getElementById('chk-agotado').checked = false;
             eliminarFoto();
-            fotoUrlExistente = '';
         }
 
         async function guardar() {
@@ -2516,25 +2472,23 @@
             const mp = document.getElementById('mp').value.trim();
             const destacado = document.getElementById('chk-destacado').checked;
             const agotado = document.getElementById('chk-agotado').checked;
-            
+            const foto = document.getElementById('foto-base64').value;
+
             if (!nombre || !precio) {
                 alert('completá nombre y precio');
                 return;
             }
-            
-            // Obtener URL de la foto
-            const fotoUrl = document.getElementById('foto').value.trim() || fotoUrlExistente;
 
             let productoGuardado;
             if (id) {
                 const i = productos.findIndex(p => p.id == id);
                 if (i >= 0) {
-                    productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado, foto: fotoUrl };
+                    productos[i] = { ...productos[i], nombre, categoria: cat, precio, mp, destacado, agotado, foto };
                     productoGuardado = productos[i];
                 }
             } else {
                 const newId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-                productoGuardado = { id: newId, nombre, categoria: cat, precio, mp, destacado, agotado, foto: fotoUrl };
+                productoGuardado = { id: newId, nombre, categoria: cat, precio, mp, destacado, agotado, foto };
                 productos.push(productoGuardado);
             }
 
@@ -2587,8 +2541,7 @@
                 
                 // Cargar foto si existe
                 if (p.foto) {
-                    fotoUrlExistente = p.foto;
-                    document.getElementById('foto').value = p.foto;
+                    document.getElementById('foto-base64').value = p.foto;
                     document.getElementById('foto-img').src = p.foto;
                     document.getElementById('foto-preview').style.display = 'block';
                 } else {
@@ -2631,29 +2584,28 @@
             }
         }
 
-        // Variable para guardar la URL de la imagen
-        let fotoUrlExistente = '';
-        
-        // Funciones para manejar la foto del producto por URL
-        function previewFotoUrl(url) {
-            if (url && url.trim()) {
-                document.getElementById('foto-img').src = url.trim();
-                document.getElementById('foto-preview').style.display = 'block';
-            } else {
-                eliminarFoto();
+        // Funciones para manejar la foto del producto
+        function previewFoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('foto-img').src = e.target.result;
+                    document.getElementById('foto-base64').value = e.target.result;
+                    document.getElementById('foto-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
             }
         }
         
         function eliminarFoto() {
             document.getElementById('foto').value = '';
             document.getElementById('foto-img').src = '';
+            document.getElementById('foto-base64').value = '';
             document.getElementById('foto-preview').style.display = 'none';
-            fotoUrlExistente = '';
         }
 
         function cancelar() {
             document.getElementById('form').style.display = 'none';
-            fotoUrlExistente = '';
         }
 
         function renderAdmin() {
